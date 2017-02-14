@@ -37,7 +37,8 @@ function draw(ctx){
   ctx.beginPath();
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   var size = 80;
-  var offset = 20;
+  var offsetx = 20;
+  var offsety = 20;
   //ctx.rect(offset, offset, size, size);
   //ctx.stroke();
   var coords = initCoords(size);
@@ -51,7 +52,7 @@ function draw(ctx){
       coords[e] = rotatePoint(pivot, elem, angle);
     }
     ctx.beginPath();
-    ctx.arc(offset + coords[e].x, offset + coords[e].y, 2, 0, 2 * Math.PI, false);
+    ctx.arc(offsetx + coords[e].x, offsety + coords[e].y, 2, 0, 2 * Math.PI, false);
     ctx.fill();
     ctx.stroke();
   });
@@ -59,8 +60,8 @@ function draw(ctx){
   var midPoints = [];
 
   coords.forEach(function(elem, e){
-    var x = offset + elem.x;
-    var y = offset + elem.y;
+    var x = offsetx + elem.x;
+    var y = offsety + elem.y;
     if(e === 0){
       ctx.beginPath();
       ctx.moveTo(x, y);
@@ -91,25 +92,52 @@ function draw(ctx){
     var normValue = featureHeight * norm;
     var point = {
       x: Math.sin(midPoints[i].angle) * normValue + midPoints[i].x,
-      y: -Math.cos(midPoints[i].angle) * normValue + midPoints[i].y
+      y: -Math.cos(midPoints[i].angle) * normValue + midPoints[i].y,
+      altx: Math.sin(midPoints[i].angle) * -normValue + midPoints[i].x,
+      alty: -Math.cos(midPoints[i].angle) * -normValue + midPoints[i].y,
     }
     midPoints[i].peak = point;
     ctx.beginPath();
-    ctx.moveTo(offset + midPoints[i].x, offset + midPoints[i].y);
-    ctx.lineTo(offset + point.x, offset + point.y);
+    ctx.moveTo(offsetx + midPoints[i].x, offsety + midPoints[i].y);
+    ctx.lineTo(offsetx + point.x, offsety + point.y);
     ctx.stroke();
   }
-  drawTriangles(ctx, offset, coords, midPoints);
+  var offset = 1;
+  drawTriangles(ctx, offsetx + 100 * offset++, offsety, coords, midPoints);
+  drawTriangles(ctx, offsetx + 100 * offset++, offsety, coords, midPoints, true);
+  drawCurves(ctx, offsetx + 100 * offset++, offsety, coords, midPoints);
+  drawCurves(ctx, offsetx + 100 * offset++, offsety, coords, midPoints, true);
 }
 
-function drawTriangles(ctx, offset, coords, midPoints){
+function drawTriangles(ctx, offsetx, offsety, coords, midPoints, alternate){
   coords.forEach(function(elem, e){
     if(e !== coords.length - 1){
-      console.log(elem, e, offset);
       ctx.beginPath();
-      ctx.moveTo(offset + coords[e].x, offset + coords[e].y);
-      ctx.lineTo(offset + midPoints[e].peak.x, offset + midPoints[e].peak.y);
-      ctx.lineTo(offset + coords[e + 1].x, offset + coords[e + 1].y);
+      ctx.moveTo(offsetx + coords[e].x, offsety + coords[e].y);
+      if(e % 2 !== 0 && alternate === true)
+        ctx.lineTo(offsetx + midPoints[e].peak.altx, offsety + midPoints[e].peak.alty);
+      else
+        ctx.lineTo(offsetx + midPoints[e].peak.x, offsety + midPoints[e].peak.y);
+      ctx.lineTo(offsetx + coords[e + 1].x, offsety + coords[e + 1].y);
+      ctx.fill();
+    }
+  });
+}
+
+
+function drawCurves(ctx, offsetx, offsety, coords, midPoints, alternate){
+  coords.forEach(function(elem, e){
+    if(e !== coords.length - 1){
+      ctx.beginPath();
+      ctx.moveTo(offsetx + coords[e].x, offsety + coords[e].y);
+      if(e % 2 !== 0 && alternate === true)
+        ctx.quadraticCurveTo(offsetx + midPoints[e].peak.altx,
+          offsety + midPoints[e].peak.alty,
+          offsetx + coords[e + 1].x, offsety + coords[e + 1].y);
+      else
+        ctx.quadraticCurveTo(offsetx + midPoints[e].peak.x,
+          offsety + midPoints[e].peak.y,
+          offsetx + coords[e + 1].x, offsety + coords[e + 1].y);
       ctx.fill();
     }
   });
