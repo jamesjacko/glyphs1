@@ -78,7 +78,8 @@ function draw(ctx){
       var midPoint = {
         x: (coords[e-1].x + coords[e].x) / 2,
         y: (coords[e-1].y + coords[e].y) / 2,
-        angle: Math.atan2(coords[e].y - coords[e-1].y, coords[e].x - coords[e-1].x)
+        angle: Math.atan2(coords[e].y - coords[e-1].y, coords[e].x - coords[e-1].x),
+        peak: {}
       }
       midPoints.push(midPoint);
     }
@@ -92,12 +93,26 @@ function draw(ctx){
       x: Math.sin(midPoints[i].angle) * normValue + midPoints[i].x,
       y: -Math.cos(midPoints[i].angle) * normValue + midPoints[i].y
     }
+    midPoints[i].peak = point;
     ctx.beginPath();
     ctx.moveTo(offset + midPoints[i].x, offset + midPoints[i].y);
     ctx.lineTo(offset + point.x, offset + point.y);
     ctx.stroke();
   }
+  drawTriangles(ctx, offset, coords, midPoints);
+}
 
+function drawTriangles(ctx, offset, coords, midPoints){
+  coords.forEach(function(elem, e){
+    if(e !== coords.length - 1){
+      console.log(elem, e, offset);
+      ctx.beginPath();
+      ctx.moveTo(offset + coords[e].x, offset + coords[e].y);
+      ctx.lineTo(offset + midPoints[e].peak.x, offset + midPoints[e].peak.y);
+      ctx.lineTo(offset + coords[e + 1].x, offset + coords[e + 1].y);
+      ctx.fill();
+    }
+  });
 }
 /**
  *  Returns normalized coordinates for initial line
