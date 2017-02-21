@@ -253,6 +253,7 @@ function drawRectangles(ctx, offsetx, offsety, coords, size, color){
     //if(count++ === 0)
     drawRectangle(ctx, elem, {x: offsetx, y:offsety}, size, colors[e]);
   });
+  ctx.globalCompositeOperation = "source-over";
   ctx.restore();
 }
 
