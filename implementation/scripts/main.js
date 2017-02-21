@@ -182,7 +182,7 @@ function initCoords(size){
 function rotatePoint(pivot, point, angle){
   var rotatedX = Math.cos(angle) * (point.x - pivot.x) - Math.sin(angle) * (point.y-pivot.y) + pivot.x;
   var rotatedY = Math.sin(angle) * (point.x - pivot.x) + Math.cos(angle) * (point.y - pivot.y) + pivot.y;
-  return {x: rotatedX, y: rotatedY};
+  return {x: (rotatedX < 0)? 1 : rotatedX, y: (rotatedY < 0)? 1 : rotatedY};
 }
 function degToRad(angle){
   return angle * (Math.PI / 180);
@@ -216,20 +216,44 @@ function closestCorner(coord, size){
 
 function drawRectangle(ctx, centre, offset, size, color){
   var point = closestCorner(centre, size);
+  var rectPoint = {
+    x: (point.x === 0)? 0 : size - ((size - centre.x) * 2),
+    y: (point.y === 0)? 0 : size - ((size - centre.y) * 2),
+    w: (point.x === 0)? centre.x * 2 : (size - centre.x) * 2,
+    h: (point.y === 0)? centre.y * 2 : (size - centre.y) * 2,
+  }
   ctx.beginPath();
-  console.log(point, size);
-  ctx.rect(point.x + offset.x, point.y + offset.y,
-    (centre.x) * 2, (centre.y) * 2);
+  ctx.rect(rectPoint.x + offset.x, rectPoint.y + offset.y,
+    rectPoint.w, rectPoint.h);
   ctx.fillStyle = color;
   ctx.fill();
 }
-function drawRectangles(ctx, offsetx, offsety, coords, size){
+function getRandomColor(opacity){
+  return "rgba("+ Math.floor(random() * 255) +
+      ","+ Math.floor(random() * 255) +
+      ","+ Math.floor(random() * 255) +
+      ","+ opacity +")";
+}
+function drawRectangles(ctx, offsetx, offsety, coords, size, color){
   var count = 0;
-  var colors = ['red', 'green', 'blue', 'yellow'];
+  var opacity = 1;
+  var colors = (typeof color === "undefined") ?
+                [getRandomColor(opacity),
+                getRandomColor(opacity),
+                getRandomColor(opacity),
+                getRandomColor(opacity)] : [
+                  'black',
+                  'black',
+                  'black',
+                  'black'
+                ];
+  ctx.save()
+  ctx.globalCompositeOperation = "screen";
   coords.forEach(function(elem, e){
     //if(count++ === 0)
     drawRectangle(ctx, elem, {x: offsetx, y:offsety}, size, colors[e]);
   });
+  ctx.restore();
 }
 
 function getValues(){
