@@ -51,12 +51,13 @@ function draw(ctx){
     if(document.getElementById("rotate").checked === true){
       coords[e] = rotatePoint(pivot, elem, angle);
     }
+    coords[e].corner = closestCorner(coords[e], size);
     ctx.beginPath();
     ctx.arc(offsetx + coords[e].x, offsety + coords[e].y, 2, 0, 2 * Math.PI, false);
     ctx.fill();
     ctx.stroke();
   });
-
+  console.log(coords);
   var midPoints = [];
 
   coords.forEach(function(elem, e){
@@ -84,7 +85,9 @@ function draw(ctx){
       }
       midPoints.push(midPoint);
     }
+
   });
+
 
   for (var i = 0; i < midPoints.length; i++) {
     var norm = (settings[i].value - settings[i].min) / (settings[i].max - settings[i].min);
@@ -107,6 +110,10 @@ function draw(ctx){
   drawTriangles(ctx, offsetx + 100 * offset++, offsety, coords, midPoints, true);
   drawCurves(ctx, offsetx + 100 * offset++, offsety, coords, midPoints);
   drawCurves(ctx, offsetx + 100 * offset++, offsety, coords, midPoints, true);
+  offset = 1;
+  drawRectangles(ctx, offsetx, offsety + 100, coords, size);
+  drawPoints(ctx, coords, {x: offsetx, y: offsety + 100})
+
 }
 
 function drawTriangles(ctx, offsetx, offsety, coords, midPoints, alternate){
@@ -190,6 +197,40 @@ window.onload = function(){
   });
 };
 
+function drawPoints(ctx, coords, offset){
+  coords.forEach(function(elem){
+    ctx.beginPath();
+    ctx.arc(offset.x + elem.x, offset.y + elem.y, 2, 0, 2 * Math.PI, false);
+    ctx.fillStyle = 'black';
+    ctx.fill();
+    ctx.stroke();
+  });
+}
+
+function closestCorner(coord, size){
+  return {
+    x: Math.floor(coord.x / (size / 2)), // divide by 2 to center coords
+    y: Math.floor(coord.y / (size / 2))
+  }
+}
+
+function drawRectangle(ctx, centre, offset, size, color){
+  var point = closestCorner(centre, size);
+  ctx.beginPath();
+  console.log(point, size);
+  ctx.rect(point.x + offset.x, point.y + offset.y,
+    (centre.x) * 2, (centre.y) * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+function drawRectangles(ctx, offsetx, offsety, coords, size){
+  var count = 0;
+  var colors = ['red', 'green', 'blue', 'yellow'];
+  coords.forEach(function(elem, e){
+    //if(count++ === 0)
+    drawRectangle(ctx, elem, {x: offsetx, y:offsety}, size, colors[e]);
+  });
+}
 
 function getValues(){
   var inputs = document.getElementsByClassName("value");
