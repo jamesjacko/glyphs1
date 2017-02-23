@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <script type="text/javascript" src="scripts/main.js"></script>
     <link rel="stylesheet" href="css/master.css" media="screen" title="no title">
-    <title></title>
+    <title>Glyphmaker</title>
   </head>
   <body>
     <div style="width:30%; float:left; height: 200px; overflow: scroll">
@@ -15,7 +15,6 @@
         <label>Value 2: <input type="text" name="value1" value="80" class="value"></label><br />
         <label>Value 3: <input type="text" name="value2" value="60" class="value"></label><br />
       </div>
-      <button type="button" name="button" id="update">Update</button><br />
     </div>
     <div style="width:30%; float:left; height: 200px;">
       <textarea name="name" rows="13" cols="80" id="JSON">{"name":"Patient",
@@ -29,8 +28,8 @@
     {"name":"age","min":0,"max":120,"value":60}
   ]}</textarea>
     </div>
-    <div style="clear:both"></div>
-    <canvas width="500" height="500" id="canvas" style="clear:both"></canvas>
+    <div style="clear:both"><button type="button" name="button" id="update">Update</button></div>
+    <canvas width="1000" height="800" id="canvas" style="clear:both"></canvas>
 
   </body>
 </html>

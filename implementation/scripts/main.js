@@ -1,6 +1,4 @@
-var seed;
-
-var settings;
+var seed, settings;
 
 /**
  * As there is no way to seed a random within the JS Math clas it is
@@ -34,8 +32,8 @@ function draw(ctx){
   ctx.beginPath();
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   var size = 80;
-  var offsetx = 20;
-  var offsety = 20;
+  var offsetx = 0;
+  var offsety = 0;
   //ctx.rect(offset, offset, size, size);
   //ctx.stroke();
   var coords = initCoords(size, settings.values.length);
@@ -44,47 +42,38 @@ function draw(ctx){
     y: (size / 2)
   };
   var angle = degToRad(random() * 180);
+  var midPoints = [];
   coords.forEach(function(elem, e){
     if(document.getElementById("rotate").checked === true){
       coords[e] = rotatePoint(pivot, elem, angle);
     }
-    coords[e].corner = closestCorner(coords[e], size);
-    ctx.beginPath();
-    ctx.arc(offsetx + coords[e].x, offsety + coords[e].y, 2, 0, 2 * Math.PI, false);
-    ctx.fill();
-    ctx.stroke();
-  });
-  var midPoints = [];
-
-  coords.forEach(function(elem, e){
-    var x = offsetx + elem.x;
-    var y = offsety + elem.y;
-    if(e === 0){
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-    } else if(e === coords.length - 1){
-      ctx.lineTo(x, y);
-      ctx.stroke();
+    coords[e].corner = closestCorner(coords[e], size);;
+    if(e !== 0){
       var midPoint = {
         x: (coords[e-1].x + coords[e].x) / 2,
         y: (coords[e-1].y + coords[e].y) / 2,
         angle: Math.atan2(coords[e].y - coords[e-1].y, coords[e].x - coords[e-1].x)
       }
       midPoints.push(midPoint);
-    } else {
-      ctx.lineTo(x, y);
-      var midPoint = {
-        x: (coords[e-1].x + coords[e].x) / 2,
-        y: (coords[e-1].y + coords[e].y) / 2,
-        angle: Math.atan2(coords[e].y - coords[e-1].y, coords[e].x - coords[e-1].x),
-        peak: {}
-      }
-      midPoints.push(midPoint);
     }
-
+    // first coord normal assigned seeded by object name
+    coords[0].normal = random();
+    for (var i = 0; i < midPoints.length; i++) {
+      var norm = (settings.values[i].value - settings.values[i].min) / (settings.values[i].max - settings.values[i].min);
+      var featureHeight = 20;
+      var normValue = featureHeight * norm;
+      var point = {
+        x: Math.sin(midPoints[i].angle) * normValue + midPoints[i].x,
+        y: -Math.cos(midPoints[i].angle) * normValue + midPoints[i].y,
+        altx: Math.sin(midPoints[i].angle) * -normValue + midPoints[i].x,
+        alty: -Math.cos(midPoints[i].angle) * -normValue + midPoints[i].y,
+      }
+      midPoints[i].peak = point;
+      // assign normals to remaining points.
+      coords[i+1].normal = norm;
+    }
   });
-  // first coord normal assigned seeded by object name
-  coords[0].normal = random();
+
   for (var i = 0; i < midPoints.length; i++) {
     var norm = (settings.values[i].value - settings.values[i].min) / (settings.values[i].max - settings.values[i].min);
     var featureHeight = 20;
@@ -96,41 +85,90 @@ function draw(ctx){
       alty: -Math.cos(midPoints[i].angle) * -normValue + midPoints[i].y,
     }
     midPoints[i].peak = point;
-    ctx.beginPath();
-    ctx.moveTo(offsetx + midPoints[i].x, offsety + midPoints[i].y);
-    ctx.lineTo(offsetx + point.x, offsety + point.y);
-    ctx.stroke();
     // assign normals to remaining points.
     coords[i+1].normal = norm;
   }
-  var offset = 1;
-  drawTriangles(ctx, offsetx + 100 * offset++, offsety, coords, midPoints);
-  drawTriangles(ctx, offsetx + 100 * offset++, offsety, coords, midPoints, true);
-  drawCurves(ctx, offsetx + 100 * offset++, offsety, coords, midPoints);
-  drawCurves(ctx, offsetx + 100 * offset++, offsety, coords, midPoints, true);
-  offset = 1;
+  var offset = 0;
   var opacity = 1;
   var colors = [];
+  var canvasWidth = ctx.canvas.width;
+  console.log(canvasWidth);
   for (var i = 0; i <= settings.values.length; i++) {
     colors.push(getRandomColor(opacity));
   };
-  drawRectangles(ctx, offsetx, offsety + 100, coords, size, colors);
-  drawPoints(ctx, coords, {x: offsetx, y: offsety + 100});
-  drawRectangles(ctx, offsetx + 100 * offset++, offsety + 100, coords, size, colors,
+  var glyphSize = size + 20;
+
+  drawLine(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth), coords);
+
+  drawPoints(ctx, coords, {x: (offsetx + glyphSize * offset) % canvasWidth, y:  Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize});
+
+  drawMidPointLines(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth), coords, midPoints);
+
+  drawLine(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset) / canvasWidth), coords);
+  drawPoints(ctx, coords, {x: (offsetx + glyphSize * offset) % canvasWidth, y:  Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize});
+
+  drawLine(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset) / canvasWidth), coords);
+  drawPoints(ctx, coords, {x: (offsetx + glyphSize * offset) % canvasWidth, y:  Math.floor((offsety + glyphSize * offset) / canvasWidth) * glyphSize});
+  drawMidPointLines(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth), coords, midPoints);
+
+  drawLine(ctx,  (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset) / canvasWidth) * glyphSize, coords);
+  drawPoints(ctx, coords, {x:  (offsetx + glyphSize * offset) % canvasWidth, y: Math.floor((offsety + glyphSize * offset) / canvasWidth) * glyphSize});
+  drawMidPointLines(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints, true);
+
+
+  drawTriangles(ctx,(offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints);
+
+  drawTriangles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints, true);
+
+  drawCurves(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints);
+
+  drawCurves(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints, true);
+
+  drawRectangles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset) / canvasWidth) * glyphSize, coords, size, colors);
+  drawPoints(ctx, coords, {x: (offsetx + glyphSize * offset) % canvasWidth, y: Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize});
+
+  drawRectangles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
     {intersections: 1});
 
-  drawRectangles(ctx, offsetx + 100 * offset++, offsety + 100, coords, size, colors,
+  drawRectangles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
     {intersections: 2});
 
-  offset = 1;
+  drawRectangles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset) / canvasWidth) * glyphSize, coords, size, colors, {relative: true});
+  drawPoints(ctx, coords, {x: (offsetx + glyphSize * offset) % canvasWidth, y: Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize});
 
-  drawRectangles(ctx, offsetx, offsety + 200, coords, size, colors, {relative: true});
-  drawPoints(ctx, coords, {x: offsetx, y: offsety + 200});
-  drawRectangles(ctx, offsetx + 100 * offset++, offsety + 200, coords, size, colors,
+  drawRectangles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
     {intersections: 1, relative: true});
 
-  drawRectangles(ctx, offsetx + 100 * offset++, offsety + 200, coords, size, colors,
+  drawRectangles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
     {intersections: 2, relative: true});
+}
+
+function drawLine(ctx, offsetx, offsety, coords){
+  coords.forEach(function(elem, e){
+    var x = offsetx + elem.x;
+    var y = offsety + elem.y;
+    if(e === 0){
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    } else if(e === coords.length - 1){
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    } else {
+      ctx.lineTo(x, y);
+    }
+  });
+}
+
+function drawMidPointLines(ctx, offsetx, offsety, coords, midPoints, alternate){
+  for (var i = 0; i < midPoints.length; i++) {
+    ctx.beginPath();
+    ctx.moveTo(offsetx + midPoints[i].x, offsety + midPoints[i].y);
+    if(typeof alternate !== "undefined" && i % 2 === 0)
+      ctx.lineTo(offsetx + midPoints[i].peak.altx, offsety + midPoints[i].peak.alty);
+    else
+      ctx.lineTo(offsetx + midPoints[i].peak.x, offsety + midPoints[i].peak.y);
+    ctx.stroke();
+  }
 }
 
 function drawTriangles(ctx, offsetx, offsety, coords, midPoints, alternate){
@@ -240,7 +278,7 @@ function drawRectangle(ctx, centre, offset, size, color, options){
   if(once++ < settings.values.length + 1){
     ctx.fillStyle = color;
     ctx.font = "bold 9px Arial";
-    ctx.fillText("Option" + once, 40 * once, 450);
+    ctx.fillText("Option" + once, 40 * once, ctx.canvas.height - 30);
   }
   var point = closestCorner(centre, size);
   if(options && options.relative){
