@@ -41,7 +41,7 @@ function draw(ctx){
   var offsety = 20;
   //ctx.rect(offset, offset, size, size);
   //ctx.stroke();
-  var coords = initCoords(size);
+  var coords = initCoords(size, 3);
   var pivot = {
     x: (size / 2),
     y: (size / 2)
@@ -86,8 +86,8 @@ function draw(ctx){
     }
 
   });
-
-
+  // first coord normal assigned seeded by object name
+  coords[0].normal = random();
   for (var i = 0; i < midPoints.length; i++) {
     var norm = (settings[i].value - settings[i].min) / (settings[i].max - settings[i].min);
     var featureHeight = 20;
@@ -103,6 +103,8 @@ function draw(ctx){
     ctx.moveTo(offsetx + midPoints[i].x, offsety + midPoints[i].y);
     ctx.lineTo(offsetx + point.x, offsety + point.y);
     ctx.stroke();
+    // assign normals to remaining points.
+    coords[i+1].normal = norm;
   }
   var offset = 1;
   drawTriangles(ctx, offsetx + 100 * offset++, offsety, coords, midPoints);
@@ -116,9 +118,22 @@ function draw(ctx){
                 getRandomColor(opacity),
                 getRandomColor(opacity)];
   drawRectangles(ctx, offsetx, offsety + 100, coords, size, colors);
-  drawPoints(ctx, coords, {x: offsetx, y: offsety + 100})
-  drawRectangles(ctx, offsetx + 100 * offset++, offsety + 100, coords, size, colors, 1);
-  drawRectangles(ctx, offsetx + 100 * offset++, offsety + 100, coords, size, colors, 2);
+  drawPoints(ctx, coords, {x: offsetx, y: offsety + 100});
+  drawRectangles(ctx, offsetx + 100 * offset++, offsety + 100, coords, size, colors,
+    {intersections: 1});
+
+  drawRectangles(ctx, offsetx + 100 * offset++, offsety + 100, coords, size, colors,
+    {intersections: 2});
+
+  offset = 1;
+
+  drawRectangles(ctx, offsetx, offsety + 200, coords, size, colors, {relative: true});
+  drawPoints(ctx, coords, {x: offsetx, y: offsety + 200});
+  drawRectangles(ctx, offsetx + 100 * offset++, offsety + 200, coords, size, colors,
+    {intersections: 1, relative: true});
+
+  drawRectangles(ctx, offsetx + 100 * offset++, offsety + 200, coords, size, colors,
+    {intersections: 2, relative: true});
 }
 
 function drawTriangles(ctx, offsetx, offsety, coords, midPoints, alternate){
@@ -158,27 +173,26 @@ function drawCurves(ctx, offsetx, offsety, coords, midPoints, alternate){
  *  Returns normalized coordinates for initial line
  */
 
-function initCoords(size){
+function initCoords(size, numCoords){
   var range = size * 0.9;
   var off = (size * 0.1) / 2;
   var points = [
     {
       x: Math.round(0.1 * size),
       y: Math.round((random() * range) + off)
-    },
-    {
-      x: Math.round(0.35 * size),
-      y: Math.round((random() * range) + off)
-    },
-    {
-      x: Math.round(0.65 * size),
-      y: Math.round((random() * range) + off)
-    },
-    {
+    }]
+    for (var i = 1; i < numCoords; i++) {
+      points.push({
+        x: Math.round((1 / (numCoords - 1)) * i * size),
+        y: Math.round((random() * range) + off)
+      })
+    }
+
+    points.push({
       x: Math.round(0.9 * size),
       y: Math.round((random() * range) + off)
-    }
-  ];
+    });
+
   return points;
 }
 /**
@@ -218,14 +232,29 @@ function closestCorner(coord, size){
     y: Math.floor(coord.y / (size / 2))
   }
 }
-
-function drawRectangle(ctx, centre, offset, size, color){
+var once = 0;
+function drawRectangle(ctx, centre, offset, size, color, options){
+  // plus 1 to settings to account for name
+  if(once++ < settings.length + 1){
+    ctx.fillStyle = color;
+    ctx.font = "bold 16px Arial";
+    ctx.fillText("Option" + once, 100 * once, 450);
+  }
   var point = closestCorner(centre, size);
-  var rectPoint = {
-    x: (point.x === 0)? 0 : size - ((size - centre.x) * 2),
-    y: (point.y === 0)? 0 : size - ((size - centre.y) * 2),
-    w: (point.x === 0)? centre.x * 2 : (size - centre.x) * 2,
-    h: (point.y === 0)? centre.y * 2 : (size - centre.y) * 2,
+  if(options && options.relative){
+    var rectPoint = {
+      x: (point.x === 0)? 0 : size - ((size - centre.x) * 2),
+      y: (point.y === 0)? 0 : size - ((size - centre.y) * 2),
+      w: (point.x === 0)? centre.x * 2 * centre.normal : (size - centre.x) * 2 * centre.normal,
+      h: (point.y === 0)? centre.y * 2 * centre.normal : (size - centre.y) * 2 * centre.normal,
+    };
+  } else {
+    var rectPoint = {
+      x: (point.x === 0)? 0 : size - ((size - centre.x) * 2),
+      y: (point.y === 0)? 0 : size - ((size - centre.y) * 2),
+      w: (point.x === 0)? centre.x * 2 : (size - centre.x) * 2,
+      h: (point.y === 0)? centre.y * 2 : (size - centre.y) * 2,
+    };
   }
   ctx.beginPath();
   ctx.rect(rectPoint.x + offset.x, rectPoint.y + offset.y,
@@ -240,21 +269,27 @@ function getRandomColor(opacity){
       ","+ Math.floor(random() * 255) +
       ","+ opacity +")";
 }
-function drawRectangles(ctx, offsetx, offsety, coords, size, colors, intersections){
+function drawRectangles(ctx, offsetx, offsety, coords, size, colors, options){
+  console.log(coords);
   var count = 0;
   ctx.save()
   ctx.globalCompositeOperation = "screen";
   var rectangles = [];
   coords.forEach(function(elem, e){
     //if(count++ === 0)
-    rectangles.push(drawRectangle(ctx, elem, {x: offsetx, y:offsety}, size, colors[e]));
+    if(options && options.relative)
+      rectangles.push(drawRectangle(ctx, elem, {x: offsetx, y:offsety}, size, colors[e], {relative: true}));
+    else
+      rectangles.push(drawRectangle(ctx, elem, {x: offsetx, y:offsety}, size, colors[e]));
   });
 
   ctx.globalCompositeOperation = "source-over";
-  if(intersections === 1){
-    removeIntersections(ctx, rectangles, {x: offsetx, y:offsety}, size);
-  } else if(intersections === 2){
-    keepIntersections(ctx, rectangles, {x: offsetx, y:offsety}, size);
+  if(options){
+    if(options.intersections === 1){
+      removeIntersections(ctx, rectangles, {x: offsetx, y:offsety}, size);
+    } else if(options.intersections === 2){
+      keepIntersections(ctx, rectangles, {x: offsetx, y:offsety}, size);
+    }
   }
   ctx.restore();
 }
@@ -270,7 +305,6 @@ function removeIntersections(ctx, rectangles, offset, size){
           y2: Math.min(elem.y + elem.h, rectangles[i].y + rectangles[i].h)
         }
         if(intersection.x1 < intersection.x2 && intersection.y1 < intersection.y2){
-          console.log(intersection);
           ctx.beginPath();
           ctx.rect(intersection.x1 + offset.x, intersection.y1 + offset.y,
             intersection.x2 - intersection.x1,
@@ -308,7 +342,6 @@ function keepIntersections(ctx, rectangles, offset, size){
     }
   });
   var inside;
-  console.log(intersections);
   for (var x = 0; x < size; x++) {
     for (var y = 0; y < size; y++) {
       inside = false;
