@@ -110,10 +110,10 @@ function draw(ctx){
   drawCurves(ctx, offsetx + 100 * offset++, offsety, coords, midPoints, true);
   offset = 1;
   var opacity = 1;
-  var colors = [getRandomColor(opacity),
-                getRandomColor(opacity),
-                getRandomColor(opacity),
-                getRandomColor(opacity)];
+  var colors = [];
+  for (var i = 0; i <= settings.values.length; i++) {
+    colors.push(getRandomColor(opacity));
+  };
   drawRectangles(ctx, offsetx, offsety + 100, coords, size, colors);
   drawPoints(ctx, coords, {x: offsetx, y: offsety + 100});
   drawRectangles(ctx, offsetx + 100 * offset++, offsety + 100, coords, size, colors,
@@ -239,8 +239,8 @@ function drawRectangle(ctx, centre, offset, size, color, options){
   // plus 1 to settings to account for name
   if(once++ < settings.values.length + 1){
     ctx.fillStyle = color;
-    ctx.font = "bold 16px Arial";
-    ctx.fillText("Option" + once, 100 * once, 450);
+    ctx.font = "bold 9px Arial";
+    ctx.fillText("Option" + once, 40 * once, 450);
   }
   var point = closestCorner(centre, size);
   if(options && options.relative){
