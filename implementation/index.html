@@ -7,12 +7,30 @@
     <title></title>
   </head>
   <body>
-    <input type="text" name="name" value="Patient" id="seedValue"><br />
-    <label>Rotate: <input type="checkbox" name="name" value="rotate" id="rotate" checked></label><br />
-    <label>Value 1: <input type="text" name="value0" value="2" class="value"></label><br />
-    <label>Value 2: <input type="text" name="value1" value="80" class="value"></label><br />
-    <label>Value 3: <input type="text" name="value2" value="60" class="value"></label><br />
-    <button type="button" name="button" id="update">Update</button><br />
-    <canvas width="500" height="500" id="canvas"></canvas>
+    <div style="width:30%; float:left; height: 200px;">
+      <input type="text" name="name" value="Patient" id="seedValue"><br />
+      <label>Rotate: <input type="checkbox" name="name" value="rotate" id="rotate" checked></label><br />
+      <div id="details">
+        <label>Value 1: <input type="text" name="value0" value="2" class="value"></label><br />
+        <label>Value 2: <input type="text" name="value1" value="80" class="value"></label><br />
+        <label>Value 3: <input type="text" name="value2" value="60" class="value"></label><br />
+      </div>
+      <button type="button" name="button" id="update">Update</button><br />
+    </div>
+    <div style="width:30%; float:left; height: 200px;">
+      <textarea name="name" rows="13" cols="80" id="JSON">{"name":"Patient",
+  "values":[
+    {"name":"height","min":1,"max":2.5,"value":2},
+    {"name":"weight","min":0,"max":100,"value":80},
+    {"name":"blood","min":40,"max":60,"value":60},
+    {"name":"age","min":0,"max":120,"value":60},
+    {"name":"weight","min":0,"max":100,"value":80},
+    {"name":"blood","min":40,"max":60,"value":60},
+    {"name":"age","min":0,"max":120,"value":60}
+  ]}</textarea>
+    </div>
+    <div style="clear:both"></div>
+    <canvas width="500" height="500" id="canvas" style="clear:both"></canvas>
+
   </body>
 </html>

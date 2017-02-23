@@ -1,25 +1,6 @@
 var seed;
 
-var settings = [
-  {
-    name: "height",
-    min: 1.0,
-    max: 2.5,
-    value: 0
-  },
-  {
-    name: "weight",
-    min: 0,
-    max: 100,
-    value: 0
-  },
-  {
-    name: "blood",
-    min: 40,
-    max: 60,
-    value: 0
-  }
-];
+var settings;
 
 /**
  * As there is no way to seed a random within the JS Math clas it is
@@ -29,7 +10,23 @@ function random() {
     var x = Math.sin(seed++) * 10000;
     return x - Math.floor(x);
 }
+function getJSONObj(){
+  settings = JSON.parse(document.getElementById('JSON').value);
+}
 
+function loadDataPoints(){
+  getJSONObj();
+  document.getElementById('seedValue').value = settings.name;
+  var inputs = "";
+  settings.values.forEach(function(elem, e){
+    inputs += '<label>' + elem.name +
+              ': <input type="text" name="value' + e +
+              '" value="' + elem.value +
+              '" class="value" disabled></label><br />';
+  });
+  document.getElementById('details').innerHTML = inputs;
+  console.log(JSON.stringify(settings));
+}
 
 function draw(ctx){
   getValues();
@@ -41,7 +38,7 @@ function draw(ctx){
   var offsety = 20;
   //ctx.rect(offset, offset, size, size);
   //ctx.stroke();
-  var coords = initCoords(size, 3);
+  var coords = initCoords(size, settings.values.length);
   var pivot = {
     x: (size / 2),
     y: (size / 2)
@@ -89,7 +86,7 @@ function draw(ctx){
   // first coord normal assigned seeded by object name
   coords[0].normal = random();
   for (var i = 0; i < midPoints.length; i++) {
-    var norm = (settings[i].value - settings[i].min) / (settings[i].max - settings[i].min);
+    var norm = (settings.values[i].value - settings.values[i].min) / (settings.values[i].max - settings.values[i].min);
     var featureHeight = 20;
     var normValue = featureHeight * norm;
     var point = {
@@ -180,18 +177,20 @@ function initCoords(size, numCoords){
     {
       x: Math.round(0.1 * size),
       y: Math.round((random() * range) + off)
-    }]
-    for (var i = 1; i < numCoords; i++) {
-      points.push({
-        x: Math.round((1 / (numCoords - 1)) * i * size),
-        y: Math.round((random() * range) + off)
-      })
-    }
-
+    }];
+  var multiplier = 1 / (numCoords);
+  console.log(multiplier);
+  for (var i = 1; i < numCoords; i++) {
     points.push({
-      x: Math.round(0.9 * size),
+      x: Math.round((((multiplier * i) * 0.8) + 0.1) * size),
       y: Math.round((random() * range) + off)
-    });
+    })
+  }
+
+  points.push({
+    x: Math.round(0.9 * size),
+    y: Math.round(/*(random() * range) + off*/50)
+  });
 
   return points;
 }
@@ -209,9 +208,12 @@ function degToRad(angle){
 window.onload = function(){
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext("2d");
+  loadDataPoints();
   draw(ctx);
   document.getElementById("update").addEventListener("click", function(e){
     e.preventDefault();
+    getJSONObj();
+    loadDataPoints();
     draw(ctx);
   });
 };
@@ -235,7 +237,7 @@ function closestCorner(coord, size){
 var once = 0;
 function drawRectangle(ctx, centre, offset, size, color, options){
   // plus 1 to settings to account for name
-  if(once++ < settings.length + 1){
+  if(once++ < settings.values.length + 1){
     ctx.fillStyle = color;
     ctx.font = "bold 16px Arial";
     ctx.fillText("Option" + once, 100 * once, 450);
@@ -270,7 +272,6 @@ function getRandomColor(opacity){
       ","+ opacity +")";
 }
 function drawRectangles(ctx, offsetx, offsety, coords, size, colors, options){
-  console.log(coords);
   var count = 0;
   ctx.save()
   ctx.globalCompositeOperation = "screen";
@@ -366,7 +367,7 @@ function keepIntersections(ctx, rectangles, offset, size){
 function getValues(){
   var inputs = document.getElementsByClassName("value");
   for (var i = 0; i < inputs.length; i++) {
-    settings[i].value = parseFloat(inputs[i].value);
+    settings.values[i].value = parseFloat(inputs[i].value);
   }
 }
 
