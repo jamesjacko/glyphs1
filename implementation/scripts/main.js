@@ -57,7 +57,6 @@ function draw(ctx){
     ctx.fill();
     ctx.stroke();
   });
-  console.log(coords);
   var midPoints = [];
 
   coords.forEach(function(elem, e){
@@ -111,9 +110,15 @@ function draw(ctx){
   drawCurves(ctx, offsetx + 100 * offset++, offsety, coords, midPoints);
   drawCurves(ctx, offsetx + 100 * offset++, offsety, coords, midPoints, true);
   offset = 1;
-  drawRectangles(ctx, offsetx, offsety + 100, coords, size);
+  var opacity = 1;
+  var colors = [getRandomColor(opacity),
+                getRandomColor(opacity),
+                getRandomColor(opacity),
+                getRandomColor(opacity)];
+  drawRectangles(ctx, offsetx, offsety + 100, coords, size, colors);
   drawPoints(ctx, coords, {x: offsetx, y: offsety + 100})
-
+  drawRectangles(ctx, offsetx + 100 * offset++, offsety + 100, coords, size, colors, 1);
+  drawRectangles(ctx, offsetx + 100 * offset++, offsety + 100, coords, size, colors, 2);
 }
 
 function drawTriangles(ctx, offsetx, offsety, coords, midPoints, alternate){
@@ -158,20 +163,20 @@ function initCoords(size){
   var off = (size * 0.1) / 2;
   var points = [
     {
-      x: 0.1 * size,
-      y: (random() * range) + off
+      x: Math.round(0.1 * size),
+      y: Math.round((random() * range) + off)
     },
     {
-      x: 0.35 * size,
-      y: (random() * range) + off
+      x: Math.round(0.35 * size),
+      y: Math.round((random() * range) + off)
     },
     {
-      x: 0.65 * size,
-      y: (random() * range) + off
+      x: Math.round(0.65 * size),
+      y: Math.round((random() * range) + off)
     },
     {
-      x: 0.9 * size,
-      y: (random() * range) + off
+      x: Math.round(0.9 * size),
+      y: Math.round((random() * range) + off)
     }
   ];
   return points;
@@ -182,7 +187,7 @@ function initCoords(size){
 function rotatePoint(pivot, point, angle){
   var rotatedX = Math.cos(angle) * (point.x - pivot.x) - Math.sin(angle) * (point.y-pivot.y) + pivot.x;
   var rotatedY = Math.sin(angle) * (point.x - pivot.x) + Math.cos(angle) * (point.y - pivot.y) + pivot.y;
-  return {x: (rotatedX < 0)? 1 : rotatedX, y: (rotatedY < 0)? 1 : rotatedY};
+  return {x: (rotatedX < 0)? 1 : Math.round(rotatedX), y: (rotatedY < 0)? 1 : Math.round(rotatedY)};
 }
 function degToRad(angle){
   return angle * (Math.PI / 180);
@@ -227,6 +232,7 @@ function drawRectangle(ctx, centre, offset, size, color){
     rectPoint.w, rectPoint.h);
   ctx.fillStyle = color;
   ctx.fill();
+  return rectPoint;
 }
 function getRandomColor(opacity){
   return "rgba("+ Math.floor(random() * 255) +
@@ -234,28 +240,95 @@ function getRandomColor(opacity){
       ","+ Math.floor(random() * 255) +
       ","+ opacity +")";
 }
-function drawRectangles(ctx, offsetx, offsety, coords, size, color){
+function drawRectangles(ctx, offsetx, offsety, coords, size, colors, intersections){
   var count = 0;
-  var opacity = 1;
-  var colors = (typeof color === "undefined") ?
-                [getRandomColor(opacity),
-                getRandomColor(opacity),
-                getRandomColor(opacity),
-                getRandomColor(opacity)] : [
-                  'black',
-                  'black',
-                  'black',
-                  'black'
-                ];
   ctx.save()
   ctx.globalCompositeOperation = "screen";
+  var rectangles = [];
   coords.forEach(function(elem, e){
     //if(count++ === 0)
-    drawRectangle(ctx, elem, {x: offsetx, y:offsety}, size, colors[e]);
+    rectangles.push(drawRectangle(ctx, elem, {x: offsetx, y:offsety}, size, colors[e]));
   });
+
   ctx.globalCompositeOperation = "source-over";
+  if(intersections === 1){
+    removeIntersections(ctx, rectangles, {x: offsetx, y:offsety}, size);
+  } else if(intersections === 2){
+    keepIntersections(ctx, rectangles, {x: offsetx, y:offsety}, size);
+  }
   ctx.restore();
 }
+
+function removeIntersections(ctx, rectangles, offset, size){
+  rectangles.forEach(function(elem, e){
+    for (var i = 0; i < rectangles.length; i++) {
+      if(i !== e){
+        var intersection = {
+          x1: Math.max(elem.x, rectangles[i].x),
+          y1: Math.max(elem.y, rectangles[i].y),
+          x2: Math.min(elem.x + elem.w, rectangles[i].x + rectangles[i].w),
+          y2: Math.min(elem.y + elem.h, rectangles[i].y + rectangles[i].h)
+        }
+        if(intersection.x1 < intersection.x2 && intersection.y1 < intersection.y2){
+          console.log(intersection);
+          ctx.beginPath();
+          ctx.rect(intersection.x1 + offset.x, intersection.y1 + offset.y,
+            intersection.x2 - intersection.x1,
+            intersection.y2 - intersection.y1);
+          ctx.fillStyle = 'white';
+          ctx.fill();
+        }
+      }
+    }
+  });
+}
+function keepIntersections(ctx, rectangles, offset, size){
+  var intersections = [];
+  rectangles.forEach(function(elem, e){
+    for (var i = 0; i < rectangles.length; i++) {
+      if(i !== e){
+        var intersection = {
+          x1: Math.max(elem.x, rectangles[i].x),
+          y1: Math.max(elem.y, rectangles[i].y),
+          x2: Math.min(elem.x + elem.w, rectangles[i].x + rectangles[i].w),
+          y2: Math.min(elem.y + elem.h, rectangles[i].y + rectangles[i].h)
+        }
+        if(intersection.x1 < intersection.x2 && intersection.y1 < intersection.y2){
+          var notThere = true;
+          intersections.forEach(function(elem){
+            if (elem.x1 === intersection.x1 && elem.x2 === intersection.x2
+                && elem.y1 === intersection.y1 && elem.y2 === intersection.y2){
+              notThere = false;
+            }
+          });
+          if(notThere)
+            intersections.push(intersection);
+        }
+      }
+    }
+  });
+  var inside;
+  console.log(intersections);
+  for (var x = 0; x < size; x++) {
+    for (var y = 0; y < size; y++) {
+      inside = false;
+
+      intersections.forEach(function(elem){
+        if((x >= elem.x1 && x <= elem.x2) && (y >= elem.y1 && y <= elem.y2)){
+          inside = true;
+        }
+
+      });
+      if(!inside){
+        ctx.beginPath();
+        ctx.rect(x + offset.x, y + offset.y, 1, 1);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+      }
+    }
+  }
+}
+
 
 function getValues(){
   var inputs = document.getElementsByClassName("value");
