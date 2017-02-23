@@ -118,11 +118,19 @@ function draw(ctx){
 
   drawTriangles(ctx,(offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints);
 
-  drawTriangles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints, true);
+  drawTriangles(ctx,(offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints, {colors: colors});
+
+  drawTriangles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints, {alternate:true});
+
+  drawTriangles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints, {alternate:true, colors: colors});
 
   drawCurves(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints);
 
-  drawCurves(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints, true);
+  drawCurves(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints, {colors: colors});
+
+  drawCurves(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints, {alternate:true});
+
+  drawCurves(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, midPoints, {alternate:true, colors: colors});
 
   drawRectangles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset) / canvasWidth) * glyphSize, coords, size, colors);
   drawPoints(ctx, coords, {x: (offsetx + glyphSize * offset) % canvasWidth, y: Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize});
@@ -171,38 +179,57 @@ function drawMidPointLines(ctx, offsetx, offsety, coords, midPoints, alternate){
   }
 }
 
-function drawTriangles(ctx, offsetx, offsety, coords, midPoints, alternate){
+function drawTriangles(ctx, offsetx, offsety, coords, midPoints, options){
+  ctx.save();
   coords.forEach(function(elem, e){
     if(e !== coords.length - 1){
       ctx.beginPath();
       ctx.moveTo(offsetx + coords[e].x, offsety + coords[e].y);
-      if(e % 2 !== 0 && alternate === true)
-        ctx.lineTo(offsetx + midPoints[e].peak.altx, offsety + midPoints[e].peak.alty);
+      if(typeof options !== "undefined"){
+        if(typeof options.colors !== "undefined"){
+          ctx.fillStyle = options.colors[e]
+        }
+        if(e % 2 !== 0 && options.alternate === true)
+          ctx.lineTo(offsetx + midPoints[e].peak.altx, offsety + midPoints[e].peak.alty);
+        else
+          ctx.lineTo(offsetx + midPoints[e].peak.x, offsety + midPoints[e].peak.y);
+      }
       else
         ctx.lineTo(offsetx + midPoints[e].peak.x, offsety + midPoints[e].peak.y);
       ctx.lineTo(offsetx + coords[e + 1].x, offsety + coords[e + 1].y);
       ctx.fill();
     }
   });
+  ctx.restore();
 }
 
 
-function drawCurves(ctx, offsetx, offsety, coords, midPoints, alternate){
+function drawCurves(ctx, offsetx, offsety, coords, midPoints, options){
+  ctx.save();
   coords.forEach(function(elem, e){
     if(e !== coords.length - 1){
       ctx.beginPath();
       ctx.moveTo(offsetx + coords[e].x, offsety + coords[e].y);
-      if(e % 2 !== 0 && alternate === true)
-        ctx.quadraticCurveTo(offsetx + midPoints[e].peak.altx,
-          offsety + midPoints[e].peak.alty,
-          offsetx + coords[e + 1].x, offsety + coords[e + 1].y);
-      else
+      if(typeof options !== "undefined"){
+        if(typeof options.colors !== "undefined")
+          ctx.fillStyle = options.colors[e];
+        if(e % 2 !== 0 && options.alternate === true)
+          ctx.quadraticCurveTo(offsetx + midPoints[e].peak.altx,
+            offsety + midPoints[e].peak.alty,
+            offsetx + coords[e + 1].x, offsety + coords[e + 1].y);
+        else
+          ctx.quadraticCurveTo(offsetx + midPoints[e].peak.x,
+            offsety + midPoints[e].peak.y,
+            offsetx + coords[e + 1].x, offsety + coords[e + 1].y);
+      } else {
         ctx.quadraticCurveTo(offsetx + midPoints[e].peak.x,
           offsety + midPoints[e].peak.y,
           offsetx + coords[e + 1].x, offsety + coords[e + 1].y);
+      }
       ctx.fill();
     }
   });
+  ctx.restore();
 }
 /**
  *  Returns normalized coordinates for initial line
