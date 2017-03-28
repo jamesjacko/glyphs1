@@ -149,6 +149,9 @@ function draw(ctx){
 
   drawRectangles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
     {intersections: 2, relative: true});
+
+  drawCircles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
+    {intersections: 2, relative: true});
 }
 
 function drawLine(ctx, offsetx, offsety, coords){
@@ -336,6 +339,22 @@ function getRandomColor(opacity){
       ","+ Math.floor(random() * 255) +
       ","+ opacity +")";
 }
+
+function drawCircle(ctx, centre, offset, size, color, options){
+  // plus 1 to settings to account for name
+  if(once++ < settings.values.length + 1){
+    ctx.fillStyle = color;
+    ctx.font = "bold 9px Arial";
+    ctx.fillText("Option" + once, 40 * once, ctx.canvas.height - 30);
+  }
+  var sizeNorm = (options && options.relative)? (size / 2) * centre.normal : size / 2;
+  ctx.beginPath();
+  ctx.arc(offset.x + centre.x, offset.y + centre.y, size/2, 0, 2 * Math.PI, false);
+  ctx.fillStyle = color;
+  ctx.fill();
+  return {centre, size: sizeNorm};
+}
+
 function drawRectangles(ctx, offsetx, offsety, coords, size, colors, options){
   var count = 0;
   ctx.save()
@@ -357,6 +376,32 @@ function drawRectangles(ctx, offsetx, offsety, coords, size, colors, options){
       keepIntersections(ctx, rectangles, {x: offsetx, y:offsety}, size);
     }
   }
+  ctx.restore();
+}
+
+function drawCircles(ctx, offsetx, offsety, coords, size, colors, options){
+
+  console.log(typeof coords);
+  var count = 0;
+  ctx.save()
+  ctx.globalCompositeOperation = "screen";
+  var circles = [];
+  coords.forEach(function(elem, e){
+    //if(count++ === 0)
+    if(options && options.relative)
+      circles.push(drawCircle(ctx, elem, {x: offsetx, y:offsety}, size, colors[e], {relative: true}));
+    else
+      circles.push(drawCircle(ctx, elem, {x: offsetx, y:offsety}, size, colors[e]));
+  });
+
+  ctx.globalCompositeOperation = "source-over";
+  // if(options){
+  //   if(options.intersections === 1){
+  //     removeIntersections(ctx, circles, {x: offsetx, y:offsety}, size);
+  //   } else if(options.intersections === 2){
+  //     keepIntersections(ctx, circles, {x: offsetx, y:offsety}, size);
+  //   }
+  // }
   ctx.restore();
 }
 
