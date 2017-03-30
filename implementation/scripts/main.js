@@ -151,6 +151,12 @@ function draw(ctx){
     {intersections: 2, relative: true});
 
   drawCircles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
+    {relative: true});
+
+  drawCircles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
+    {intersections: 1, relative: true});
+
+  drawCircles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
     {intersections: 2, relative: true});
 }
 
@@ -347,9 +353,13 @@ function drawCircle(ctx, centre, offset, size, color, options){
     ctx.font = "bold 9px Arial";
     ctx.fillText("Option" + once, 40 * once, ctx.canvas.height - 30);
   }
-  var sizeNorm = (options && options.relative)? (size / 2) * centre.normal : size / 2;
+  var point = closestCorner(centre, size);
+
+  var width = Math.min(Math.abs(point.x * size - centre.x), Math.abs(point.y * size - centre.y));
+
+  var sizeNorm = (options && options.relative)? width * centre.normal : width;
   ctx.beginPath();
-  ctx.arc(offset.x + centre.x, offset.y + centre.y, size/2, 0, 2 * Math.PI, false);
+  ctx.arc(offset.x + centre.x, offset.y + centre.y, sizeNorm, 0, 2 * Math.PI, false);
   ctx.fillStyle = color;
   ctx.fill();
   return {centre, size: sizeNorm};
@@ -395,14 +405,42 @@ function drawCircles(ctx, offsetx, offsety, coords, size, colors, options){
   });
 
   ctx.globalCompositeOperation = "source-over";
-  // if(options){
-  //   if(options.intersections === 1){
-  //     removeIntersections(ctx, circles, {x: offsetx, y:offsety}, size);
-  //   } else if(options.intersections === 2){
-  //     keepIntersections(ctx, circles, {x: offsetx, y:offsety}, size);
-  //   }
-  // }
+  if(options){
+    if(options.intersections){
+      if(options.intersections === 1){
+        circleIntersections(ctx, circles, {x: offsetx, y:offsety}, size, true);
+      } else if(options.intersections === 2){
+        circleIntersections(ctx, circles, {x: offsetx, y:offsety}, size, false);
+      }
+    }
+  }
   ctx.restore();
+}
+
+function circleIntersections(ctx, circles, offset, size, remove){
+  var insideCount = 0;
+  for (var i = 0; i < size; i++) {
+    for (var j = 0; j < size; j++) {
+      circles.forEach(function(circle, e){
+        if(insideCircle(circle.centre, circle.size, {x: i, y: j})){
+          insideCount++;
+        }
+      });
+      if(insideCount > 1 && remove){
+        ctx.beginPath();
+        ctx.rect(i + offset.x, j+ offset.y, 1, 1);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+      }
+      if(insideCount <= 1 && !remove){
+        ctx.beginPath();
+        ctx.rect(i + offset.x, j+ offset.y, 1, 1);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+      }
+      insideCount = 0;
+    }
+  }
 }
 
 function removeIntersections(ctx, rectangles, offset, size){
@@ -427,6 +465,17 @@ function removeIntersections(ctx, rectangles, offset, size){
     }
   });
 }
+
+
+/**
+ * keepIntersections - description
+ *
+ * @param  {type} ctx        description
+ * @param  {type} rectangles description
+ * @param  {type} offset     description
+ * @param  {type} size       description
+ * @return {type}            description
+ */
 function keepIntersections(ctx, rectangles, offset, size){
   var intersections = [];
   rectangles.forEach(function(elem, e){
@@ -474,6 +523,9 @@ function keepIntersections(ctx, rectangles, offset, size){
 }
 
 
+/**
+ * get the values from inputs in the DOM with the class "values"
+ */
 function getValues(){
   var inputs = document.getElementsByClassName("value");
   for (var i = 0; i < inputs.length; i++) {
@@ -494,3 +546,26 @@ function getValues(){
    }
    return hash;
  };
+
+/**
+ * Checks whether a given point is inside a circle described by a centre point and radius
+ * @param {object} circleCentre The centre point of the circle (object with x and y properties {x: 10, y: 10})
+ * @param {number} radius       The radius of the circle
+ * @param {object} point        The point to check (object with x and y properties {x: 10, y: 10})
+ * @return {boolean}            True or False depending on whether the point is within the circle
+ */
+function insideCircle(circleCentre, radius, point){
+  return eDist(circleCentre, point) <= radius;
+}
+
+/**
+ * Find the Euclidean distance between two points
+ * @param {object} point1       The first point (object with x and y properties {x: 10, y: 10})
+ * @param {object} point2       The second point (object with x and y properties {x: 10, y: 10})
+ * @return {number}             The Euclidean distance between the points
+ */
+function eDist(point1, point2){
+  var first = Math.pow((point1.x - point2.x), 2);
+  var second = Math.pow((point1.y - point2.y), 2);
+  return Math.sqrt(first + second);
+}
