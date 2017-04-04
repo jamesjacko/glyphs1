@@ -158,6 +158,23 @@ function draw(ctx){
 
   drawCircles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
     {intersections: 2, relative: true});
+
+
+  metaBalls(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
+    {relative: true});
+  metaBalls(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors);
+
+  drawCircles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset) / canvasWidth) * glyphSize, coords, size, colors,
+    {relative: true});
+  metaBalls(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
+    {relative: true});
+
+  drawCircles(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset) / canvasWidth) * glyphSize, coords, size, colors,
+      {relative: false});
+  metaBalls(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
+      {relative: false});
+
+
 }
 
 function drawLine(ctx, offsetx, offsety, coords){
@@ -391,7 +408,7 @@ function drawRectangles(ctx, offsetx, offsety, coords, size, colors, options){
 
 function drawCircles(ctx, offsetx, offsety, coords, size, colors, options){
 
-  console.log(typeof coords);
+  // console.log(typeof coords);
   var count = 0;
   ctx.save()
   ctx.globalCompositeOperation = "screen";
@@ -452,7 +469,7 @@ function getCircle(centre, offset, size, options){
 }
 
 function metaBalls(ctx, offsetx, offsety, coords, size, colors, options){
-  console.log(typeof coords);
+  // console.log(typeof coords);
   var count = 0;
   ctx.save()
   ctx.globalCompositeOperation = "screen";
@@ -462,23 +479,32 @@ function metaBalls(ctx, offsetx, offsety, coords, size, colors, options){
     if(options && options.relative)
       balls.push(getCircle(elem, {x: offsetx, y:offsety}, size, {relative: true}));
     else
-      balls.push(drawCircle(elem, {x: offsetx, y:offsety}, size));
+      balls.push(getCircle(elem, {x: offsetx, y:offsety}, size));
   });
   var influence = 0;
+  var infMin = 10000000;
+  var infMax = 0;
   for (var x = 0; x < size; x++) {
     for (var y = 0; y < size; y++) {
       influence = 0;
       balls.forEach(function(ball){
-        influence += ball.size / (Math.pow(x - ball.centre.x, 2) + Math.pow(y - ball.centre.y, 2));
+        influence += (ball.size/ (size)) / (Math.pow(x - ball.centre.x, 2) + Math.pow(y - ball.centre.y, 2));
       });
-      if(influence < 0.001){
+      infMin = influence < infMin? influence : infMin;
+      infMax = influence > infMax? influence : infMax;
+      if(influence > 10)
+        console.log(influence);
+      if(influence > 0.002){
         ctx.beginPath();
-        ctx.rect(x + offset.x, y+ offset.y, 1, 1);
+        ctx.rect(x + offsetx, y + offsety, 1, 1);
         ctx.fillStyle = 'black';
         ctx.fill();
       }
     }
   }
+  console.log("Max:", infMax);
+  console.log("Min:", infMin);
+
 }
 
 function removeIntersections(ctx, rectangles, offset, size){
