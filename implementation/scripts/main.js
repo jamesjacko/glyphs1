@@ -443,6 +443,44 @@ function circleIntersections(ctx, circles, offset, size, remove){
   }
 }
 
+
+function getCircle(centre, offset, size, options){
+  var point = closestCorner(centre, size);
+  var width = Math.min(Math.abs(point.x * size - centre.x), Math.abs(point.y * size - centre.y));
+  var sizeNorm = (options && options.relative)? width * centre.normal : width;
+  return {centre, size: sizeNorm};
+}
+
+function metaBalls(ctx, offsetx, offsety, coords, size, colors, options){
+  console.log(typeof coords);
+  var count = 0;
+  ctx.save()
+  ctx.globalCompositeOperation = "screen";
+  var balls = [];
+  coords.forEach(function(elem, e){
+    //if(count++ === 0)
+    if(options && options.relative)
+      balls.push(getCircle(elem, {x: offsetx, y:offsety}, size, {relative: true}));
+    else
+      balls.push(drawCircle(elem, {x: offsetx, y:offsety}, size));
+  });
+  var influence = 0;
+  for (var x = 0; x < size; x++) {
+    for (var y = 0; y < size; y++) {
+      influence = 0;
+      balls.forEach(function(ball){
+        influence += ball.size / (Math.pow(x - ball.centre.x, 2) + Math.pow(y - ball.centre.y, 2));
+      });
+      if(influence < 0.001){
+        ctx.beginPath();
+        ctx.rect(x + offset.x, y+ offset.y, 1, 1);
+        ctx.fillStyle = 'black';
+        ctx.fill();
+      }
+    }
+  }
+}
+
 function removeIntersections(ctx, rectangles, offset, size){
   rectangles.forEach(function(elem, e){
     for (var i = 0; i < rectangles.length; i++) {
