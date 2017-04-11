@@ -461,11 +461,11 @@ function circleIntersections(ctx, circles, offset, size, remove){
 }
 
 
-function getCircle(centre, offset, size, options){
+function getCircle(centre, offset, size, color, options){
   var point = closestCorner(centre, size);
   var width = Math.min(Math.abs(point.x * size - centre.x), Math.abs(point.y * size - centre.y));
   var sizeNorm = (options && options.relative)? width * centre.normal : width;
-  return {centre, size: sizeNorm};
+  return {centre, size: sizeNorm, color: color};
 }
 
 function metaBalls(ctx, offsetx, offsety, coords, size, colors, options){
@@ -477,10 +477,11 @@ function metaBalls(ctx, offsetx, offsety, coords, size, colors, options){
   coords.forEach(function(elem, e){
     //if(count++ === 0)
     if(options && options.relative)
-      balls.push(getCircle(elem, {x: offsetx, y:offsety}, size, {relative: true}));
+      balls.push(getCircle(elem, {x: offsetx, y:offsety}, size, colors[e], {relative: true}));
     else
-      balls.push(getCircle(elem, {x: offsetx, y:offsety}, size));
+      balls.push(getCircle(elem, {x: offsetx, y:offsety}, size, colors[e]));
   });
+  console.log(pairCircles(balls));
   var influence = 0;
   var infMin = 10000000;
   var infMax = 0;
@@ -492,8 +493,6 @@ function metaBalls(ctx, offsetx, offsety, coords, size, colors, options){
       });
       infMin = influence < infMin? influence : infMin;
       infMax = influence > infMax? influence : infMax;
-      if(influence > 10)
-        console.log(influence);
       if(influence > 0.002){
         ctx.beginPath();
         ctx.rect(x + offsetx, y + offsety, 1, 1);
@@ -502,9 +501,39 @@ function metaBalls(ctx, offsetx, offsety, coords, size, colors, options){
       }
     }
   }
-  console.log("Max:", infMax);
-  console.log("Min:", infMin);
+}
 
+function pairCircles(circles){
+  var pair = -1;
+  var dist = 0;
+  var min = 1000;
+  var pairs = [];
+  var paired = [];
+  for (var n = 0; n < circles.length; n++) {
+    console.log(paired.indexOf(n));
+    if(paired.indexOf(n) > -1){
+      continue;
+    }
+    for (var i = 0; i < circles.length; i++) {
+
+      if(paired.indexOf(i) > -1)
+        continue;
+      if(i != n){
+        dist = Math.sqrt(Math.pow(circles[i].centre.x - circles[n].centre.x, 2) +
+               Math.pow(circles[i].centre.y - circles[n].centre.y, 2));
+        dist -= circles[i].size + circles[n].size;
+        if(dist < min){
+          pair = i;
+          min = dist;
+        }
+      }
+    }
+    paired.push(pair);
+    paired.push(n);
+    pairs.push({circle1: n, circle2: pair});
+  }
+  console.log(paired);
+  return pairs;
 }
 
 function removeIntersections(ctx, rectangles, offset, size){
