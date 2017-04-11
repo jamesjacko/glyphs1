@@ -174,6 +174,8 @@ function draw(ctx){
   metaBalls(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
       {relative: false});
 
+  metaBalls(ctx, (offsetx + glyphSize * offset) % canvasWidth, Math.floor((offsety + glyphSize * offset++) / canvasWidth) * glyphSize, coords, size, colors,
+      {relative: true, pairs: true});
 
 }
 
@@ -472,7 +474,7 @@ function metaBalls(ctx, offsetx, offsety, coords, size, colors, options){
   // console.log(typeof coords);
   var count = 0;
   ctx.save()
-  ctx.globalCompositeOperation = "screen";
+  ctx.globalCompositeOperation = "source-over";
   var balls = [];
   coords.forEach(function(elem, e){
     //if(count++ === 0)
@@ -481,24 +483,68 @@ function metaBalls(ctx, offsetx, offsety, coords, size, colors, options){
     else
       balls.push(getCircle(elem, {x: offsetx, y:offsety}, size, colors[e]));
   });
-  console.log(pairCircles(balls));
+  var pairs = pairCircles(balls);
+
   var influence = 0;
   var infMin = 10000000;
   var infMax = 0;
   for (var x = 0; x < size; x++) {
     for (var y = 0; y < size; y++) {
-      influence = 0;
-      balls.forEach(function(ball){
-        influence += (ball.size/ (size)) / (Math.pow(x - ball.centre.x, 2) + Math.pow(y - ball.centre.y, 2));
-      });
-      infMin = influence < infMin? influence : infMin;
-      infMax = influence > infMax? influence : infMax;
-      if(influence > 0.002){
+      if(options && options.pairs){
+        influence = 0;
+        pairs.forEach(function(pair){
+          if(pair.length > 1){
+            pair.forEach(function(ball){
+              influence += (balls[ball].size/ (size)) / (Math.pow(x - balls[ball].centre.x, 2) + Math.pow(y - balls[ball].centre.y, 2));
+            });
+          } else {
+            influence += (balls[pair].size/ (size)) / (Math.pow(x - balls[pair].centre.x, 2) + Math.pow(y - balls[pair].centre.y, 2));
+          }
+          var color;
+          // maxInf = sensitivity (centre size)
+          var fuzziness = 0.2;
+          var maxInf = 0.002;
+          var minInf = maxInf - (maxInf * fuzziness);
+          var opacity = (influence - minInf) / (maxInf - minInf);
+          opacity = (opacity > 1)? 1 : opacity;
+          if(pair.length > 1){
+            color = ctx.createLinearGradient(balls[pair[0]].centre.x  + offsetx, balls[pair[0]].centre.y + offsety, balls[pair[1]].centre.x + offsetx, balls[pair[1]].centre.y + offsety);
+            color.addColorStop(0, balls[pair[0]].color.replace(/[^,]+(?=\))/, opacity));
+            color.addColorStop(1, balls[pair[1]].color.replace(/[^,]+(?=\))/, opacity));
+          } else {
+            color = balls[pair].color.replace(/[^,]+(?=\))/, opacity);
+          }
+
+          ctx.beginPath();
+          ctx.rect(x + offsetx, y + offsety, 1, 1);
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.closePath();
+          influence = 0;
+        });
+
+      } else {
+        influence = 0;
+        balls.forEach(function(ball){
+          influence += (ball.size/ (size)) / (Math.pow(x - ball.centre.x, 2) + Math.pow(y - ball.centre.y, 2));
+        });
+
+        // maxInf = sensitivity (centre size)
+        var fuzziness = 0.1;
+        var maxInf = 0.002;
+        var minInf = maxInf - (maxInf * fuzziness);
+        var opacity = (influence - minInf) / (maxInf - minInf);
+
+        opacity = (opacity > 1)? 1 : opacity;
+
+        var color = "rgba(0,0,0," + opacity +")";
+
         ctx.beginPath();
         ctx.rect(x + offsetx, y + offsety, 1, 1);
-        ctx.fillStyle = 'black';
+        ctx.fillStyle = color;
         ctx.fill();
       }
+
     }
   }
 }
@@ -509,14 +555,14 @@ function pairCircles(circles){
   var min = 1000;
   var pairs = [];
   var paired = [];
+
   for (var n = 0; n < circles.length; n++) {
-    console.log(paired.indexOf(n));
-    if(paired.indexOf(n) > -1){
+    if(paired.indexOf(n) !== -1){
       continue;
     }
     for (var i = 0; i < circles.length; i++) {
 
-      if(paired.indexOf(i) > -1)
+      if(paired.indexOf(i) !== -1)
         continue;
       if(i != n){
         dist = Math.sqrt(Math.pow(circles[i].centre.x - circles[n].centre.x, 2) +
@@ -528,14 +574,51 @@ function pairCircles(circles){
         }
       }
     }
-    paired.push(pair);
-    paired.push(n);
-    pairs.push({circle1: n, circle2: pair});
-  }
-  console.log(paired);
+    if(pair != -1){
+      paired.push(pair);
+      paired.push(n);
+      pairs.push([n, pair]);
+    } else {
+      pairs.push(n);
+    }
+    min = 1000;
+    pair = -1;
+  };
   return pairs;
 }
 
+
+function testingRemoval(){
+  var a = [1,2,3,4,5,6,7,8];
+  var sel = -1;
+  var pairs = [];
+  var paired = [];
+  for (var i = 0; i < a.length; i++) {
+
+    if(paired.indexOf(i) !== -1){
+      console.log("here 1");
+      continue;
+    }
+    for (var j = 0; j < a.length; j++) {
+      if(paired.indexOf(j) !== -1){
+        continue;
+      }
+      if(i !== j){
+        if(Math.random() < 0.5){
+          sel = j;
+        }
+      }
+    }
+    pairs.push({
+      1: i,
+      2: sel
+    });
+    paired.push(i);
+    paired.push(sel);
+  }
+  return pairs;
+
+}
 function removeIntersections(ctx, rectangles, offset, size){
   rectangles.forEach(function(elem, e){
     for (var i = 0; i < rectangles.length; i++) {
