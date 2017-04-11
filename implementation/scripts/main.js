@@ -553,37 +553,46 @@ function pairCircles(circles){
   var pair = -1;
   var dist = 0;
   var min = 1000;
+  var num = Math.floor(circles.length / 2);
+  var rem = circles.length % 2;
   var pairs = [];
   var paired = [];
+  var lengths = [];
 
-  for (var n = 0; n < circles.length; n++) {
-    if(paired.indexOf(n) !== -1){
-      continue;
-    }
-    for (var i = 0; i < circles.length; i++) {
-
-      if(paired.indexOf(i) !== -1)
-        continue;
-      if(i != n){
-        dist = Math.sqrt(Math.pow(circles[i].centre.x - circles[n].centre.x, 2) +
-               Math.pow(circles[i].centre.y - circles[n].centre.y, 2));
-        dist -= circles[i].size + circles[n].size;
-        if(dist < min){
-          pair = i;
-          min = dist;
-        }
+  for (var i = 0; i < circles.length; i++) {
+    for (var j = 0; j < circles.length; j++) {
+      if(i != j) {
+        lengths.push({
+          a: i,
+          b: j,
+          dist: Math.sqrt(
+            Math.pow(circles[i].centre.x - circles[j].centre.x,2) +
+            Math.pow(circles[i].centre.y - circles[j].centre.y,2))
+        })
       }
     }
-    if(pair != -1){
-      paired.push(pair);
-      paired.push(n);
-      pairs.push([n, pair]);
-    } else {
-      pairs.push(n);
+  }
+  lengths.sort(function(a,b){
+    if(a.dist < b.dist) return -1;
+    if(a.dist > b.dist) return 1;
+    return 0;
+  });
+
+  for (var i = 0; i < lengths.length && num > 0; i++) {
+    if(paired.indexOf(lengths[i].a) === -1 && paired.indexOf(lengths[i].b) === -1){
+      pairs.push([lengths[i].a, lengths[i].b]);
+      paired.push(lengths[i].a);
+      paired.push(lengths[i].b);
+      num -= 1;
     }
-    min = 1000;
-    pair = -1;
-  };
+  }
+  if(rem === 1){
+    paired.sort();
+    for (var i = 0; i < circles.length; i++) {
+      if(paired.indexOf(i)=== -1)
+        pairs.push(i);
+    }
+  }
   return pairs;
 }
 
