@@ -1,4 +1,4 @@
-var seed, colorSeed, settings;
+var seed, settings;
 
 /**
  * As there is no way to seed a random within the JS Math clas it is
@@ -29,7 +29,6 @@ function loadDataPoints(){
 function draw(ctx){
   getValues();
   seed = document.getElementById("seedValue").value.hashCode();
-  colorSeed = seed;
   ctx.beginPath();
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   var size = 80;
@@ -91,11 +90,9 @@ function draw(ctx){
   }
   var offset = 0;
   var opacity = 1;
-
   var colors = [];
   var canvasWidth = ctx.canvas.width;
   console.log(canvasWidth);
-  seed = colorSeed;
   for (var i = 0; i <= settings.values.length; i++) {
     colors.push(getRandomColor(opacity));
   };
