@@ -97,7 +97,7 @@ function draw(ctx){
   console.log(canvasWidth);
   seed = colorSeed;
   for (var i = 0; i <= settings.values.length; i++) {
-    colors.push(getRandomColor(opacity));
+    colors.push(getRandomColor(opacity)); 
   };
   var glyphSize = size + 20;
 
