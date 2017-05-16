@@ -1,9 +1,21 @@
 .glyph{
   float:left;
 }
-.main.container {
+.container.pager {
     margin-top: 7em;
+    margin-bottom: 1em;
   }
 #JSON{
   width:100%;
+}
+.checkbox{
+  width:60px;
+  margin-bottom: 10px;
+}
+canvas{
+  background: #FFF;
+  padding:5px;
+  border-radius: 5px;
+  box-shadow: 1px 1px 5px #333;
+  margin:0 10px 10px 0;
 }

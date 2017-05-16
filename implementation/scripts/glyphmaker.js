@@ -27,9 +27,11 @@ function loadDataPoints(obj) {
 function draw(ctx, glyph) {
     ctx.beginPath();
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    var size = ctx.canvas.width - 10;
-    var offsetx = 10;
-    var offsety = 10;
+    var size = ctx.canvas.width * 0.9;
+    var offsetx = Math.round((size * 0.1) / 2);
+    var offsety = offsetx;
+
+
     //ctx.rect(offset, offset, size, size);
     //ctx.stroke();
     var coords = initCoords(size, settings.values.length);
@@ -268,7 +270,7 @@ function draw(ctx, glyph) {
             break;
 
         case 30:
-            drawPairedBars(ctx, size, pairedCoords, {x: offsetx, y: offsety}, 1, colors);
+            drawPairedBars(ctx, size, pairedCoords, {x: offsetx, y: offsety}, 0.5, colors);
             break;
 
     }
