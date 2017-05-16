@@ -32,6 +32,20 @@ window.onload = function() {
     document.getElementById("update").addEventListener("click", function(){
       generateGlyphs("glyphs", numGlyphTypes);
     });
+    document.getElementById("all").addEventListener("click", function(){
+      var checks = document.getElementsByClassName("glyphType");
+      Array.prototype.forEach.call(checks, function(e){
+        e.checked = true;
+      });
+      generateGlyphs("glyphs", numGlyphTypes);
+    });
+    document.getElementById("none").addEventListener("click", function(){
+      var checks = document.getElementsByClassName("glyphType");
+      Array.prototype.forEach.call(checks, function(e){
+        e.checked = false;
+      });
+      generateGlyphs("glyphs", numGlyphTypes);
+    });
 }
 
 function depictChecked(checked){
@@ -72,5 +86,9 @@ function generateGlyph(id, glyph, obj) {
     canvas.style.background = "#FFF";
     div.appendChild(canvas);
     getGlyph(canvas, glyph, obj);
+    canvas.addEventListener('click', function(){
+      document.getElementById("glyph" + (glyph + 1)).checked = false;
+      generateGlyphs("glyphs");
+    });
     document.getElementById(id).appendChild(div);
 }
