@@ -1,5 +1,5 @@
 window.onload = function() {
-    var numGlyphTypes = 30;
+    var numGlyphTypes = 31;
     generateGlyphs("glyphs", numGlyphTypes);
     document.getElementById("JSON").addEventListener("keydown", function(e) {
       if(e.keyCode === 13 && e.shiftKey){

@@ -264,7 +264,11 @@ function draw(ctx, glyph) {
         case 29:
             drawPairedLines(ctx, pairedCoords, {x: offsetx, y: offsety});
             drawPairedBars(ctx, size, pairedCoords, {x: offsetx, y: offsety}, 0.5, colors);
-            break
+            break;
+
+        case 30:
+            drawPairedBars(ctx, size, pairedCoords, {x: offsetx, y: offsety}, 1, colors);
+            break;
 
     }
 }
