@@ -14,19 +14,53 @@
     <title>Glyphmaker</title>
   </head>
   <body>
-    <div>
-      <textarea name="name" rows="13" cols="80" id="JSON">{"name":"Student",
-  "values":[
-    {"name":"ICP1002","min":1,"max":100,"value":80},
-    {"name":"ICP1015","min":1,"max":100,"value":80},
-    {"name":"ICP1016","min":1,"max":100,"value":60},
-    {"name":"ICP1022","min":1,"max":100,"value":60}
-  ]}</textarea>
+    <div class="ui fixed inverted menu">
+   <div class="ui container">
+     <a href="#" class="header item">
+       Glyph Maker
+     </a>
+     <a href="#" class="item">Home</a>
+     <div class="ui simple dropdown item">
+       Dropdown <i class="dropdown icon"></i>
+       <div class="menu">
+         <a class="item" href="#">Link Item</a>
+         <a class="item" href="#">Link Item</a>
+         <div class="divider"></div>
+         <div class="header">Header Item</div>
+         <div class="item">
+           <i class="dropdown icon"></i>
+           Sub Menu
+           <div class="menu">
+             <a class="item" href="#">Link Item</a>
+             <a class="item" href="#">Link Item</a>
+           </div>
+         </div>
+         <a class="item" href="#">Link Item</a>
+       </div>
+     </div>
+   </div>
+ </div>
+    <div class="ui main text container">
+      <h1 class="ui header">Generate Glyphs</h1>
+      <p>Please ammend the JSON below and press "shift + return" to see the changes.</p>
+      <div class="ui form">
+        <div class="field">
+            <textarea name="name" rows="13" cols="80" id="JSON">{"name":"Student",
+        "values":[
+          {"name":"ICP1002","min":1,"max":100,"value":80},
+          {"name":"ICP1015","min":1,"max":100,"value":80},
+          {"name":"ICP1016","min":1,"max":100,"value":60},
+          {"name":"ICP1022","min":1,"max":100,"value":60}
+        ]}</textarea>
+      </div>
+      <div id="checks">
+      </div>
     </div>
-    <div style="clear:both"><button type="button" name="button" id="update">Update</button></div>
+
+    <div style="clear:both"><button type="button" name="button" id="update" class="ui button">Update</button></div>
     <div id="glyphs">
 
     </div>
-
+    </div>
   </body>
 </html>

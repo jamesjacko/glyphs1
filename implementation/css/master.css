@@ -1,3 +1,9 @@
 .glyph{
   float:left;
 }
+.main.container {
+    margin-top: 7em;
+  }
+#JSON{
+  width:100%;
+}

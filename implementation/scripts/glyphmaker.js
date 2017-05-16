@@ -1,5 +1,6 @@
 var seed, colorSeed, settings;
 
+var GLYPH_COUNT = 31;
 /**
  * As there is no way to seed a random within the JS Math clas it is
  * necessary to provide a seedable random function.
