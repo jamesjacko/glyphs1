@@ -1,7 +1,11 @@
 window.onload = function() {
-    generateGlyphs("glyphs", 28);
-    document.getElementById("update").addEventListener("click", function() {
-        generateGlyphs("glyphs", 28);
+    var numGlyphTypes = 29;
+    generateGlyphs("glyphs", numGlyphTypes);
+    document.getElementById("JSON").addEventListener("keyup", function(e) {
+      if(e.keyCode === 13 && e.shiftKey){
+        generateGlyphs("glyphs", numGlyphTypes);
+        e.preventDefault();
+      }
     })
 }
 

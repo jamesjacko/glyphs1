@@ -32,6 +32,7 @@ function draw(ctx, glyph) {
     //ctx.rect(offset, offset, size, size);
     //ctx.stroke();
     var coords = initCoords(size, settings.values.length);
+    var pairedCoords = initPairedCoords(size, settings.values.length);
     var pivot = {
         x: (size / 2),
         y: (size / 2)
@@ -39,7 +40,8 @@ function draw(ctx, glyph) {
     var angle = degToRad(random() * 180);
     var midPoints = [];
     coords.forEach(function(elem, e) {
-        coords[e] = rotatePoint(pivot, elem, angle);
+        if(false)
+          coords[e] = rotatePoint(pivot, elem, angle);
 
         coords[e].corner = closestCorner(coords[e], size);;
         if (e !== 0) {
@@ -256,6 +258,10 @@ function draw(ctx, glyph) {
                 pairs: true
             });
             break;
+        case 28:
+            drawPairedLines(ctx, pairedCoords, {x: offsetx, y: offsety});
+            break
+
     }
 }
 
@@ -364,6 +370,29 @@ function initCoords(size, numCoords) {
 
     return points;
 }
+
+function initPairedCoords(size, numCoords){
+  var range = size * 0.9;
+  var off = (size * 0.1) / 2;
+  var height = Math.ceil(numCoords / 2);
+  var width = 2;
+  var pairedCoords = [];
+  for (var i = 0; i < height; i++) {
+    for (var j = 0; j < width; j++) {
+      pairedCoords.push({
+        a: {
+          x: off + j * (range / width),
+          y: off + (range / height) * i
+        },
+        b: {
+          x: off + (j + 1) * (range / width),
+          y: off + (range / height) * i
+        }
+      })
+    }
+  }
+  return pairedCoords;
+}
 /**
  * Rotate point around a pivot point by a give angle
  */
@@ -380,6 +409,23 @@ function degToRad(angle) {
     return angle * (Math.PI / 180);
 }
 
+function drawPairedLines(ctx, pairedCoords, offset){
+  var coords = [];
+  for (var i = 0; i < pairedCoords.length; i++) {
+    ctx.beginPath();
+    ctx.moveTo(offset.x + pairedCoords[i].a.x, offset.y + pairedCoords[i].a.y);
+
+    ctx.lineTo(offset.x + pairedCoords[i].b.x, offset.y + pairedCoords[i].b.y);
+    if(coords.indexOf(pairedCoords[i].a != -1))
+      coords.push(pairedCoords[i].a);
+    if(coords.indexOf(pairedCoords[i].b != -1))
+      coords.push(pairedCoords[i].b);
+    ctx.stroke();
+    ctx.closePath();
+  }
+  console.log(coords);
+  drawPoints(ctx, coords, offset);
+}
 
 function drawPoints(ctx, coords, offset) {
     coords.forEach(function(elem) {
