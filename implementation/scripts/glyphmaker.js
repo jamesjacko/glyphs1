@@ -32,7 +32,7 @@ function draw(ctx, glyph) {
     //ctx.rect(offset, offset, size, size);
     //ctx.stroke();
     var coords = initCoords(size, settings.values.length);
-    var pairedCoords = initPairedCoords(size, settings.values.length);
+    var pairedCoords = initPairedCoords(size, settings.values);
     var pivot = {
         x: (size / 2),
         y: (size / 2)
@@ -260,6 +260,10 @@ function draw(ctx, glyph) {
             break;
         case 28:
             drawPairedLines(ctx, pairedCoords, {x: offsetx, y: offsety});
+            break;
+        case 29:
+            drawPairedLines(ctx, pairedCoords, {x: offsetx, y: offsety});
+            drawPairedBars(ctx, size, pairedCoords, {x: offsetx, y: offsety}, 0.5, colors);
             break
 
     }
@@ -371,28 +375,6 @@ function initCoords(size, numCoords) {
     return points;
 }
 
-function initPairedCoords(size, numCoords){
-  var range = size * 0.9;
-  var off = (size * 0.1) / 2;
-  var height = Math.ceil(numCoords / 2);
-  var width = 2;
-  var pairedCoords = [];
-  for (var i = 0; i < height; i++) {
-    for (var j = 0; j < width; j++) {
-      pairedCoords.push({
-        a: {
-          x: off + j * (range / width),
-          y: off + (range / height) * i
-        },
-        b: {
-          x: off + (j + 1) * (range / width),
-          y: off + (range / height) * i
-        }
-      })
-    }
-  }
-  return pairedCoords;
-}
 /**
  * Rotate point around a pivot point by a give angle
  */
@@ -409,23 +391,6 @@ function degToRad(angle) {
     return angle * (Math.PI / 180);
 }
 
-function drawPairedLines(ctx, pairedCoords, offset){
-  var coords = [];
-  for (var i = 0; i < pairedCoords.length; i++) {
-    ctx.beginPath();
-    ctx.moveTo(offset.x + pairedCoords[i].a.x, offset.y + pairedCoords[i].a.y);
-
-    ctx.lineTo(offset.x + pairedCoords[i].b.x, offset.y + pairedCoords[i].b.y);
-    if(coords.indexOf(pairedCoords[i].a != -1))
-      coords.push(pairedCoords[i].a);
-    if(coords.indexOf(pairedCoords[i].b != -1))
-      coords.push(pairedCoords[i].b);
-    ctx.stroke();
-    ctx.closePath();
-  }
-  console.log(coords);
-  drawPoints(ctx, coords, offset);
-}
 
 function drawPoints(ctx, coords, offset) {
     coords.forEach(function(elem) {
@@ -925,4 +890,78 @@ function getGlyph(canvas, glyph, obj){
   var ctx = canvas.getContext("2d");
   loadDataPoints(obj);
   draw(ctx, glyph);
+}
+
+
+
+function initPairedCoords(size, values){
+  var range = size * 0.9;
+  var off = (size * 0.1) / 2;
+  var height = Math.ceil(Math.sqrt(values.length));
+  var width = height;
+  var pairedCoords = [];
+  var counter = 0;
+  for (var i = 0; i < height; i++) {
+    for (var j = 0; j < width; j++) {
+      var val = values[counter++];
+      if(typeof val !== "undefined"){
+        pairedCoords.push({
+          a: {
+            x: off + j * (range / width),
+            y: off + (range / height) * i + (range / height) / 2
+          },
+          b: {
+            x: off + (j + 1) * (range / width),
+            y: off + (range / height) * i + (range / height) / 2
+          },
+          val: (val.value / (val.max - val.min)).toPrecision(2)
+        });
+      }
+    }
+  }
+  return pairedCoords;
+}
+
+function drawPairedLines(ctx, pairedCoords, offset){
+  var coords = [];
+  for (var i = 0; i < pairedCoords.length; i++) {
+    ctx.beginPath();
+    ctx.moveTo(offset.x + pairedCoords[i].a.x, offset.y + pairedCoords[i].a.y);
+
+    ctx.lineTo(offset.x + pairedCoords[i].b.x, offset.y + pairedCoords[i].b.y);
+    if(coords.indexOf(pairedCoords[i].a != -1))
+      coords.push(pairedCoords[i].a);
+    if(coords.indexOf(pairedCoords[i].b != -1))
+      coords.push(pairedCoords[i].b);
+    ctx.stroke();
+    ctx.closePath();
+  }
+  drawPoints(ctx, coords, offset);
+}
+
+function drawPairedBars(ctx, size, pairedCoords, offset, barWidth, colors){
+  var range = size * 0.9;
+  var off = (size * 0.1) / 2;
+  var height = Math.ceil(Math.sqrt(pairedCoords.length));
+  var width = height;
+  barWidth = (range / width) * barWidth;
+  var barHeight = (range / height) / 2;
+  var barLeft = ((range / width) / 2) - (barWidth / 2);
+  var centre = (range / height) / 2;
+  var counter = 0;
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      if(typeof pairedCoords[counter] !== "undefined"){
+        barHeight = ((range / height)) * pairedCoords[counter].val;
+        ctx.beginPath();
+        ctx.rect(barLeft + (range/width * x) + offset.x + off,
+                (range/height * y) + ((range/height - barHeight)/2) + off + offset.y,
+                 barWidth, barHeight);
+        if(typeof colors !== "undefined")
+          ctx.fillStyle = colors[counter++];
+        ctx.fill();
+        ctx.closePath();
+      }
+    }
+  }
 }
