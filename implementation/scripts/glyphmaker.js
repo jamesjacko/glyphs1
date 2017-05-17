@@ -1,6 +1,6 @@
 var seed, colorSeed, settings;
 
-var GLYPH_COUNT = 31;
+var GLYPH_COUNT = 33;
 /**
  * As there is no way to seed a random within the JS Math clas it is
  * necessary to provide a seedable random function.
@@ -36,6 +36,7 @@ function draw(ctx, glyph) {
     //ctx.stroke();
     var coords = initCoords(size, settings.values.length);
     var pairedCoords = initPairedCoords(size, settings.values);
+    var lockedPairedCoords = initLockedPairedCoords(size, settings.values);
     var pivot = {
         x: (size / 2),
         y: (size / 2)
@@ -43,8 +44,8 @@ function draw(ctx, glyph) {
     var angle = degToRad(random() * 180);
     var midPoints = [];
     coords.forEach(function(elem, e) {
-        if(false)
-          coords[e] = rotatePoint(pivot, elem, angle);
+        if (false)
+            coords[e] = rotatePoint(pivot, elem, angle);
 
         coords[e].corner = closestCorner(coords[e], size);;
         if (e !== 0) {
@@ -262,15 +263,48 @@ function draw(ctx, glyph) {
             });
             break;
         case 28:
-            drawPairedLines(ctx, pairedCoords, {x: offsetx, y: offsety});
+            drawPairedLines(ctx, pairedCoords, {
+                x: offsetx,
+                y: offsety
+            });
+            drawPoints(ctx, pairedCoords.rawCoords, {
+                x: offsetx,
+                y: offsety
+            });
             break;
         case 29:
-            drawPairedLines(ctx, pairedCoords, {x: offsetx, y: offsety});
-            drawPairedBars(ctx, size, pairedCoords, {x: offsetx, y: offsety}, 0.5, colors);
+            drawPairedLines(ctx, pairedCoords, {
+                x: offsetx,
+                y: offsety
+            });
+            drawPairedBars(ctx, size, pairedCoords, {
+                x: offsetx,
+                y: offsety
+            }, 0.5, colors);
             break;
 
         case 30:
-            drawPairedBars(ctx, size, pairedCoords, {x: offsetx, y: offsety}, 0.5, colors);
+            drawPairedBars(ctx, size, pairedCoords, {
+                x: offsetx,
+                y: offsety
+            }, 0.5, colors);
+            break;
+
+        case 31:
+            drawPairedLines(ctx, lockedPairedCoords, {
+                x: offsetx,
+                y: offsety
+            });
+            break;
+        case 32:
+            drawPairedLines(ctx, lockedPairedCoords, {
+                x: offsetx,
+                y: offsety
+            });
+            drawPairedCoordsConnection(ctx, size, lockedPairedCoords, {
+                x: offsetx,
+                y: offsety
+            })
             break;
 
     }
@@ -893,82 +927,146 @@ function eDist(point1, point2) {
 }
 
 
-function getGlyph(canvas, glyph, obj){
-  var ctx = canvas.getContext("2d");
-  loadDataPoints(obj);
-  draw(ctx, glyph);
+function getGlyph(canvas, glyph, obj) {
+    var ctx = canvas.getContext("2d");
+    loadDataPoints(obj);
+    draw(ctx, glyph);
 }
 
 
 
-function initPairedCoords(size, values){
-  var range = size * 0.9;
-  var off = (size * 0.1) / 2;
-  var height = Math.ceil(Math.sqrt(values.length));
-  var width = height;
-  var pairedCoords = [];
-  var counter = 0;
-  for (var i = 0; i < height; i++) {
-    for (var j = 0; j < width; j++) {
-      var val = values[counter++];
-      if(typeof val !== "undefined"){
-        pairedCoords.push({
-          a: {
-            x: off + j * (range / width),
-            y: off + (range / height) * i + (range / height) / 2
-          },
-          b: {
-            x: off + (j + 1) * (range / width),
-            y: off + (range / height) * i + (range / height) / 2
-          },
-          val: (val.value / (val.max - val.min)).toPrecision(2)
-        });
-      }
+function initPairedCoords(size, values) {
+    var range = size * 0.9;
+    var off = (size * 0.1) / 2;
+    var height = Math.ceil(Math.sqrt(values.length));
+    var width = height;
+    var pairedCoords = [];
+    var coords = [];
+    var counter = 0;
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var val = values[counter];
+            if (typeof val !== "undefined") {
+                pairedCoords.push({
+                    a: {
+                        x: off + j * (range / width),
+                        y: off + (range / height) * i + (range / height) / 2
+                    },
+                    b: {
+                        x: off + (j + 1) * (range / width),
+                        y: off + (range / height) * i + (range / height) / 2
+                    },
+                    val: (val.value / (val.max - val.min)).toPrecision(2)
+                });
+                if (coords.indexOf(pairedCoords[counter].a != -1))
+                    coords.push(pairedCoords[counter].a);
+                if (coords.indexOf(pairedCoords[counter].b != -1))
+                    coords.push(pairedCoords[counter].b);
+                counter++;
+            }
+        }
     }
-  }
-  return pairedCoords;
+    pairedCoords.rawCoords = getRawCoords(pairedCoords);
+    return pairedCoords;
 }
 
-function drawPairedLines(ctx, pairedCoords, offset){
-  var coords = [];
-  for (var i = 0; i < pairedCoords.length; i++) {
-    ctx.beginPath();
-    ctx.moveTo(offset.x + pairedCoords[i].a.x, offset.y + pairedCoords[i].a.y);
+function getRawCoords(pairedCoords) {
+    var coords = [];
+    var addA, addB;
+    coords.push(pairedCoords[0].a);
+    coords.push(pairedCoords[0].b);
+    for (var i = 1; i < pairedCoords.length; i++) {
+        addA = addB = true;
+        for (var j = 0; j < coords.length; j++) {
+            if (coords[j].x === pairedCoords[i].a.x && coords[j].y === pairedCoords[i].a.y) {
+                addA = false;
+            }
+            if (coords[j].x === pairedCoords[i].b.x && coords[j].y === pairedCoords[i].b.y) {
+                addB = false;
+            }
+        }
+        if (addA)
+            coords.push(pairedCoords[i].a)
+        if (addB)
+            coords.push(pairedCoords[i].b)
+    }
+    return coords;
+}
 
-    ctx.lineTo(offset.x + pairedCoords[i].b.x, offset.y + pairedCoords[i].b.y);
-    if(coords.indexOf(pairedCoords[i].a != -1))
-      coords.push(pairedCoords[i].a);
-    if(coords.indexOf(pairedCoords[i].b != -1))
-      coords.push(pairedCoords[i].b);
+function drawPairedLines(ctx, pairedCoords, offset) {
+    for (var i = 0; i < pairedCoords.length; i++) {
+        ctx.beginPath();
+        ctx.moveTo(offset.x + pairedCoords[i].a.x, offset.y + pairedCoords[i].a.y);
+
+        ctx.lineTo(offset.x + pairedCoords[i].b.x, offset.y + pairedCoords[i].b.y);
+        ctx.stroke();
+        ctx.closePath();
+    }
+}
+
+function drawPairedBars(ctx, size, pairedCoords, offset, barWidth, colors) {
+    var range = size * 0.9;
+    var off = (size * 0.1) / 2;
+    var height = Math.ceil(Math.sqrt(pairedCoords.length));
+    var width = height;
+    barWidth = (range / width) * barWidth;
+    var barHeight = (range / height) / 2;
+    var barLeft = ((range / width) / 2) - (barWidth / 2);
+    var centre = (range / height) / 2;
+    var counter = 0;
+    for (var y = 0; y < height; y++) {
+        for (var x = 0; x < width; x++) {
+            if (typeof pairedCoords[counter] !== "undefined") {
+                barHeight = ((range / height)) * pairedCoords[counter].val;
+                ctx.beginPath();
+                ctx.rect(barLeft + (range / width * x) + offset.x + off,
+                    (range / height * y) + ((range / height - barHeight) / 2) + off + offset.y,
+                    barWidth, barHeight);
+                if (typeof colors !== "undefined")
+                    ctx.fillStyle = colors[counter++];
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+    }
+}
+
+function initLockedPairedCoords(size, values, centre) {
+    var radius = (size * 0.9) / 2;
+    var off = (size * 0.1) / 2;
+    if (typeof centre === "undefined") {
+        var midPoint = {
+            x: radius + off,
+            y: radius + off
+        }
+    }
+    var pairedCoords = [];
+    var counter = 0;
+    var angle = 2 * Math.PI / values.length;
+    var point;
+    for (var i = 0; i < values.length; i++) {
+        var val = values[counter++];
+        val = (val.value / (val.max - val.min)).toPrecision(2);
+        point = {
+            x: (midPoint.x + (radius * val) * Math.cos(angle * i)),
+            y: (midPoint.y + (radius * val) * Math.sin(angle * i))
+        }
+        pairedCoords.push({
+            a: midPoint,
+            b: point,
+            val: val
+        })
+    }
+    return pairedCoords;
+}
+
+function drawPairedCoordsConnection(ctx, size, pairedCoords, offset) {
+    ctx.beginPath();
+    ctx.moveTo(offset.x + pairedCoords[0].b.x, offset.y + pairedCoords[0].b.y);
+    for (var i = 1; i < pairedCoords.length; i++) {
+        ctx.lineTo(offset.x + pairedCoords[i].b.x, offset.y + pairedCoords[i].b.y);
+    }
+    ctx.lineTo(offset.x + pairedCoords[0].b.x, offset.y + pairedCoords[0].b.y);
     ctx.stroke();
     ctx.closePath();
-  }
-  drawPoints(ctx, coords, offset);
-}
-
-function drawPairedBars(ctx, size, pairedCoords, offset, barWidth, colors){
-  var range = size * 0.9;
-  var off = (size * 0.1) / 2;
-  var height = Math.ceil(Math.sqrt(pairedCoords.length));
-  var width = height;
-  barWidth = (range / width) * barWidth;
-  var barHeight = (range / height) / 2;
-  var barLeft = ((range / width) / 2) - (barWidth / 2);
-  var centre = (range / height) / 2;
-  var counter = 0;
-  for (var y = 0; y < height; y++) {
-    for (var x = 0; x < width; x++) {
-      if(typeof pairedCoords[counter] !== "undefined"){
-        barHeight = ((range / height)) * pairedCoords[counter].val;
-        ctx.beginPath();
-        ctx.rect(barLeft + (range/width * x) + offset.x + off,
-                (range/height * y) + ((range/height - barHeight)/2) + off + offset.y,
-                 barWidth, barHeight);
-        if(typeof colors !== "undefined")
-          ctx.fillStyle = colors[counter++];
-        ctx.fill();
-        ctx.closePath();
-      }
-    }
-  }
 }
