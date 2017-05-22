@@ -1,6 +1,6 @@
 var seed, colorSeed, settings;
 
-var GLYPH_COUNT = 36;
+var GLYPH_COUNT = 41;
 /**
  * As there is no way to seed a random within the JS Math clas it is
  * necessary to provide a seedable random function.
@@ -37,6 +37,18 @@ function draw(ctx, glyph) {
 	var coords = initCoords(size, settings.values.length);
 	var pairedCoords = initPairedCoords(size, settings.values);
 	var lockedPairedCoords = initLockedPairedCoords(size, settings.values);
+	var groupCenters = initGroupCenters(size, settings.groups);
+	groupedValues = [];
+	for (var i = 0; i < settings.groups.length; i++) {
+		groupedValues.push([]);
+	}
+	for (var i = 0; i < settings.values.length; i++) {
+		groupedValues[settings.values[i].group].push(settings.values[i]);
+	}
+	var groupLockedPairedCoords = [];
+	for (var i = 0; i < groupCenters.length; i++) {
+		groupLockedPairedCoords.push(initLockedPairedCoords((size * 0.9) / settings.groups.length, groupedValues[i], groupCenters[i]));
+	}
 	var pivot = {
 		x: (size / 2),
 		y: (size / 2)
@@ -97,6 +109,17 @@ function draw(ctx, glyph) {
 	for (var i = 0; i <= settings.values.length; i++) {
 		colors.push(getRandomColor(opacity));
 	};
+	var groupedColors = [];
+	for (var i = 0; i <	groupLockedPairedCoords.length; i++) {
+		groupedColors.push([]);
+	}
+	var counter = 0;
+	for (var i = 0; i < groupLockedPairedCoords.length; i++) {
+		for (var j = 0; j < groupLockedPairedCoords[i].length; j++) {
+			groupedColors[i].push(colors[counter++]);
+		}
+	}
+	console.log(groupedColors);
 	var glyphSize = size + 20;
 
 	switch (glyph) {
@@ -335,14 +358,83 @@ function draw(ctx, glyph) {
 				full: true
 			});
 			break;
-			case 35:
-				drawPairedLines(ctx, lockedPairedCoords, {
+		case 35:
+			drawPairedLines(ctx, lockedPairedCoords, {
+				x: offsetx,
+				y: offsety
+			}, {
+				triangles: true,
+				colors: colors
+			});
+			break;
+
+		case 36:
+			for (var i = 0; i < groupLockedPairedCoords.length; i++) {
+
+
+				drawPairedLines(ctx, groupLockedPairedCoords[i], {
+					x: offsetx,
+					y: offsety
+				});
+			}
+			break;
+		case 37:
+			for (var i = 0; i < groupLockedPairedCoords.length; i++) {
+				drawPairedLines(ctx, groupLockedPairedCoords[i], {
+					x: offsetx,
+					y: offsety
+				});
+				drawPairedCoordsConnection(ctx, groupLockedPairedCoords[i][0].dist / 2, groupLockedPairedCoords[i], {
+					x: offsetx,
+					y: offsety
+				})
+			}
+			break;
+		case 38:
+			for (var i = 0; i < groupLockedPairedCoords.length; i++) {
+				drawPairedLines(ctx, groupLockedPairedCoords[i], {
+					x: offsetx,
+					y: offsety
+				}, {
+					triangles: true
+				});
+
+				drawPairedLines(ctx, groupLockedPairedCoords[i], {
+					x: offsetx,
+					y: offsety
+				}, {
+					full: true
+				});
+			}
+			break;
+		case 39:
+			for (var i = 0; i < groupLockedPairedCoords.length; i++) {
+				drawPairedLines(ctx, groupLockedPairedCoords[i], {
 					x: offsetx,
 					y: offsety
 				}, {
 					triangles: true,
-					colors: colors
+					colors: groupedColors[i]
 				});
+
+				drawPairedLines(ctx, groupLockedPairedCoords[i], {
+					x: offsetx,
+					y: offsety
+				}, {
+					full: true
+				});
+			}
+			break;
+		case 40:
+			for (var i = 0; i < groupLockedPairedCoords.length; i++) {
+				drawPairedLines(ctx, groupLockedPairedCoords[i], {
+					x: offsetx,
+					y: offsety
+				}, {
+					triangles: true,
+					colors: groupedColors[i]
+				});
+			}
 	}
 }
 
@@ -1082,7 +1174,7 @@ function initLockedPairedCoords(size, values, centre) {
 	var radius = (size * 0.9) / 2;
 	var off = (size * 0.1) / 2;
 	if (typeof centre === "undefined") {
-		var midPoint = {
+		var centre = {
 			x: radius + off,
 			y: radius + off
 		}
@@ -1096,19 +1188,19 @@ function initLockedPairedCoords(size, values, centre) {
 		var val = values[counter++];
 		val = (val.value / (val.max - val.min)).toPrecision(2);
 		point = {
-			x: (midPoint.x + (radius * val) * Math.cos(angle * i)),
-			y: (midPoint.y + (radius * val) * Math.sin(angle * i))
+			x: (centre.x + (radius * val) * Math.cos(angle * i)),
+			y: (centre.y + (radius * val) * Math.sin(angle * i))
 		};
 		point2 = {
-			x: (midPoint.x + (radius * val) * Math.cos(angle * ((i + 1) % len))),
-			y: (midPoint.y + (radius * val) * Math.sin(angle * ((i + 1) % len)))
+			x: (centre.x + (radius * val) * Math.cos(angle * ((i + 1) % len))),
+			y: (centre.y + (radius * val) * Math.sin(angle * ((i + 1) % len)))
 		};
 		fullPoint = {
-			x: (midPoint.x + radius * Math.cos(angle * i)),
-			y: (midPoint.y + radius * Math.sin(angle * i))
+			x: (centre.x + radius * Math.cos(angle * i)),
+			y: (centre.y + radius * Math.sin(angle * i))
 		};
 		pairedCoords.push({
-			a: midPoint,
+			a: centre,
 			b: point,
 			c: point2,
 			fullPoint: fullPoint,
@@ -1127,4 +1219,23 @@ function drawPairedCoordsConnection(ctx, size, pairedCoords, offset) {
 	ctx.lineTo(offset.x + pairedCoords[0].b.x, offset.y + pairedCoords[0].b.y);
 	ctx.stroke();
 	ctx.closePath();
+}
+
+
+// GROUPING
+
+function initGroupCenters(size, groups) {
+	var range = size * 0.9;
+	var off = (size * 0.1) / 2;
+	var dist = range / (groups.length * 2);
+	var points = [];
+	for (var i = 0; i < groups.length; i++) {
+		var point = {
+			x: dist + (dist * 2 * i),
+			y: range / 2,
+			size: dist
+		}
+		points.push(point);
+	}
+	return points;
 }
