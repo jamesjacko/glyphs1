@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<script src="Vector.js" charset="utf-8"></script>
+	<script src="convexhull.js" charset="utf-8"></script>
+	<script type="text/javascript">
+		window.onload = function() {
+			var circles = [{
+					r: 30,
+					x: 100,
+					y: 100
+				},
+				{
+					r: 20,
+					x: 150,
+					y: 150
+				}
+			];
+			var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+			var svgNS = svg.namespaceURI;
+			for (var i = 0; i < circles.length; i++) {
+				var circle = document.createElementNS(svgNS, 'circle');
+				circle.setAttribute("cx", circles[i].x);
+				circle.setAttribute("cy", circles[i].y);
+				circle.setAttribute("r", circles[i].r);
+				circle.setAttribute("fill", "red");
+				svg.appendChild(circle);
+			}
+			var THRESHOLD = 100;
+			var distance = Math.sqrt(
+				Math.pow(circles[0].x - circles[1].x, 2) +
+				Math.pow(circles[0].y - circles[1].y, 2)
+			);
+			var circleDistance = distance - circles[0].r - circles[1].r;
+			if (THRESHOLD > distance) {
+				var height = Math.floor(Math.abs(circles[0].r - circles[1].r) * 0.5 + circles[0].r);
+				var midPointHeight = (circleDistance / distance) * height;
+
+				var v0 = new Vector(circles[0].x, circles[0].y);
+				var v1 = new Vector(circles[1].x, circles[1].y);
+				var intersection0 = findIntersect(v0, circles[0].r, v1);
+				var intersection1 = findIntersect(v1, circles[1].r, v0);
+				var midPoint = {
+					x: (intersection0.x + intersection1.x) / 2,
+					y: (intersection0.y + intersection1.y) / 2
+				}
+				console.log(intersection0);
+				var orthogonalPoints = getOrthogonalPoints({
+					x1: circles[0].x,
+					y1: circles[0].y,
+					x2: circles[1].x,
+					y2: circles[1].y,
+				}, midPoint, midPointHeight * 2);
+				console.log(orthogonalPoints);
+
+				circles[0].points = getCartesianPoints(circles[0], 4);
+				circles[1].points = getCartesianPoints(circles[1], 4);
+
+			}
+			var points = orthogonalPoints.concat(circles[0].points.concat(circles[1].points));
+			var hull = convexHull(points);
+
+			hull = sortClockwise(points, midPoint);
+			drawBlob(svg, hull);
+			svg.setAttribute("width", 500);
+			svg.setAttribute("height", 500);
+			document.body.appendChild(svg);
+		}
+
+		function sortClockwise(points, center) {
+			points.sort(function(a, b) {
+				if (a.x - center.x >= 0 && b.x - center.x < 0)
+					return true;
+				if (a.x - center.x < 0 && b.x - center.x >= 0)
+					return false;
+				if (a.x - center.x == 0 && b.x - center.x == 0) {
+					if (a.y - center.y >= 0 || b.y - center.y >= 0)
+						return a.y > b.y;
+					return b.y > a.y;
+				}
+
+				// compute the cross product of vectors (center -> a) x (center -> b)
+				var det = (a.x - center.x) * (b.y - center.y) - (b.x - center.x) * (a.y - center.y);
+				if (det < 0)
+					return true;
+				if (det > 0)
+					return false;
+
+				// points a and b are on the same line from the center
+				// check which point is closer to the center
+				var d1 = (a.x - center.x) * (a.x - center.x) + (a.y - center.y) * (a.y - center.y);
+				var d2 = (b.x - center.x) * (b.x - center.x) + (b.y - center.y) * (b.y - center.y);
+				return d1 > d2;
+			});
+			return points;
+		}
+
+		function drawBlob(svg, points) {
+			var svgNS = svg.namespaceURI;
+			var d = "M" + points[0].x + " " + points[0].y + " ";
+			for (var i = 1; i < points.length; i++) {
+				d += "L" + points[i].x + " " + points[i].y + " ";
+			}
+			d += "Z";
+			console.log(d);
+			var path = document.createElementNS(svgNS, 'path');
+			path.setAttribute('d', d);
+			path.setAttribute('stroke', "red");
+			svg.appendChild(path);
+		}
+
+		function drawPoints(svg, points) {
+			var svgNS = svg.namespaceURI;
+			for (var i = 0; i < points.length; i++) {
+				var point = document.createElementNS(svgNS, 'circle');
+				point.setAttribute('cx', points[i].x);
+				point.setAttribute('cy', points[i].y);
+				point.setAttribute('fill', 'black');
+				point.setAttribute('r', 3);
+				svg.appendChild(point);
+			}
+		}
+
+		function getOrthogonalPoints(line, midPoint, N) {
+			var dx = line.x1 - line.x2;
+			var dy = line.y1 - line.y2;
+			var dist = Math.sqrt(dx * dx + dy * dy)
+			dx /= dist
+			dy /= dist
+			var points = [{
+					x: Math.floor(midPoint.x + (N / 2) * dy),
+					y: Math.floor(midPoint.y - (N / 2) * dx)
+				},
+				{
+					x: Math.floor(midPoint.x - (N / 2) * dy),
+					y: Math.floor(midPoint.y + (N / 2) * dx)
+				}
+			];
+			return points;
+		}
+
+		function findIntersect(origin, radius, otherLineEndPoint) {
+			var v = otherLineEndPoint.subtract(origin);
+			var lineLength = v.length();
+			if (lineLength === 0) throw new Error("Length has to be positive");
+			v = v.normalize();
+			return origin.add(v.multiplyScalar(radius));
+		}
+
+		function getCartesianPoints(circle, numPoints) {
+			var rPerPoint = (2 * Math.PI) / numPoints;
+			console.log(circle);
+			var points = [];
+			for (var i = 0; i < numPoints; i++) {
+				points.push({
+					x: circle.x + Math.floor(Math.cos(rPerPoint * i) * circle.r),
+					y: circle.y + Math.floor(Math.sin(rPerPoint * i) * circle.r)
+				})
+			};
+			return points;
+		}
+	</script>
+</head>
+
+<body>
+
+</body>
+
+</html>
