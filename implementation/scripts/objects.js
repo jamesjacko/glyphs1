@@ -25,8 +25,8 @@ function getRanges(numObjects, targetNumber){
     var ranges = [];
     for(var i = 0; i < numObjects; i++){
         ranges .push({
-            min: i < targetNumber? 0: 60,
-            max: i < targetNumber? 40: 100
+            min: i < targetNumber? 30: 60,
+            max: i < targetNumber? 40: 70
         });
     }
     return shuffleArray(ranges);
@@ -49,8 +49,7 @@ function getObjects(num, corrNum){
     return objs;
 }
 
-function setupObjects(){
-    var objectCount = 25;
+function setupObjects(objectCount){
     var correctObjectCount = 5;
     return getObjects(objectCount, correctObjectCount);;
 }
