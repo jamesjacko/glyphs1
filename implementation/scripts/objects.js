@@ -25,8 +25,8 @@ function getRanges(numObjects, targetNumber){
     var ranges = [];
     for(var i = 0; i < numObjects; i++){
         ranges .push({
-            min: i < targetNumber? 30: 60,
-            max: i < targetNumber? 40: 70
+            min: i < targetNumber? 1: 41,
+            max: i < targetNumber? 40: 100
         });
     }
     return shuffleArray(ranges);
