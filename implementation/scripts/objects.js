@@ -4,7 +4,8 @@ function getObject(itemLength, range, groups){
         groups: [
             0, 1, 2
         ],
-        values: []
+        values: [],
+        correct: range.max === 40
     };
     for(var i = 0; i < itemLength; i++){
         var value = {
@@ -12,8 +13,7 @@ function getObject(itemLength, range, groups){
             min: 0,
             max: 100,
             value: Math.round(Math.random() * (range.max - range.min) + range.min),
-            group: i % groups,
-            correct: range.max === 40
+            group: i % groups
         };
         obj.values.push(value);
 

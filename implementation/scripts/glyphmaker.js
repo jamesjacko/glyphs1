@@ -119,7 +119,6 @@ function draw(ctx, glyph) {
 			groupedColors[i].push(colors[counter++]);
 		}
 	}
-	console.log(groupedColors);
 	var glyphSize = size + 20;
 
 	switch (glyph) {
@@ -634,7 +633,7 @@ function drawCircle(ctx, centre, offset, size, color, options) {
 	ctx.fillStyle = color;
 	ctx.fill();
 	return {
-		centre,
+		centre: centre,
 		size: sizeNorm
 	};
 }
@@ -754,7 +753,7 @@ function getCircle(centre, offset, size, color, options) {
 	var width = Math.min(Math.abs(point.x * size - centre.x), Math.abs(point.y * size - centre.y));
 	var sizeNorm = (options && options.relative) ? width * centre.normal : width;
 	return {
-		centre,
+		centre: centre,
 		size: sizeNorm,
 		color: color
 	};

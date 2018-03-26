@@ -22,3 +22,16 @@ canvas{
 canvas.selected{
   border-color: #13AE38;
 }
+#continue1{
+  display: none;
+  clear:both;
+  margin:0 auto;
+}
+#continue1.show{
+  display: block!important;
+}
+.clear:after {
+  content: "";
+  display: table;
+  clear: both;
+}
