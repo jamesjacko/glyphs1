@@ -3,9 +3,10 @@
 
 <head>
     <meta charset="utf-8">
+    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
     <script type="text/javascript" src="scripts/glyphmaker.js"></script>
-
     <script type="text/javascript" src="scripts/objects.js"></script>
+    <script type="text/javascript" src="scripts/firebase.js"></script>
     <script type="text/javascript" src="scripts/surveyMain.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="css/master.css" media="screen" title="no title">
@@ -13,13 +14,17 @@
 </head>
 
 <body>
-    <div id="progressbar"></div>
+
     <div class="main">
-        <div id="explanation">
+        <p id="description"></p>
+        <div id="explanation" class="clear">
 
         </div>
-        <div id="glyphs" class="clear">
+        <div id="wrapper">
+            <div id="progressbar"></div>
+            <div id="glyphs" class="clear">
 
+            </div>
         </div>
         <button id="continue1">Continue</button>
         <button id="continue2">Continue</button>

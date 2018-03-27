@@ -3,13 +3,20 @@ body{
   margin:0;
   padding:20px 0 0;
 }
-#glyphs{
+#wrapper{
   width:770px;
-  margin:0 auto;
+  margin:10px auto;
   clear: both;
+  position: relative;
+  padding: 25px 15px 15px;
+  box-shadow: 1px 1px 3px #000;
+  border: 1px solid #FFF;
 }
-#glyphs.part2{
+#wrapper.part2{
   width:550px;
+}
+#description{
+  text-align: center;
 }
 #explanation{
   width:220px;
@@ -76,5 +83,5 @@ canvas.selected{
 #progressbar.full{
   transition: width 15s linear;
   transition-timing-function: linear;
-  width:100vw;
+  width:100%;
 }

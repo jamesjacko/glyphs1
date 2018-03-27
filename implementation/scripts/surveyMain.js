@@ -10,12 +10,16 @@ var timer = null;
 var timerCount = 0;
 var part = 0;
 var oldDate = Date.now();
+var objs = null;
+var explanations = [
+    'The two images below depict a low graded and high graded student respectively.<br>Please select the 5 low graded students from the grid below and continue when done.',
+    'Please rank the following students in order, from lowest to highest.'
+]
 
 
 window.onload = function() {
     gridVersion();
     setupContinueClick();
-    startTimer();
 };
 
 function clearDivs(part){
@@ -25,20 +29,28 @@ function clearDivs(part){
     document.getElementById("continue1").classList.remove('show');
     document.getElementById("continue2").classList.remove('show');
     if(part === 0){
-        document.getElementById("glyphs").classList.remove("part2");
+        document.getElementById("wrapper").classList.remove("part2");
     } else if (part === 1){
-        document.getElementById("glyphs").classList.add("part2");
+        document.getElementById("wrapper").classList.add("part2");
     }
+    document.getElementById('description').innerHTML = explanations[part];
+}
+
+function runGlyphs(glyphType){
+    console.log(glyphType);
+    glyph = parseInt(glyphType);
+    console.log(typeof glyph);
+    generateGlyphs("glyphs", objs, glyph);
+    generateGlyph("explanation", glyph, getObject(9, {min:10, max:20}, 3));
+    generateGlyph("explanation", glyph, getObject(9, {min:80, max:100}, 3));
+    startTimer();
 }
 
 function gridVersion(){
     part = 0;
     clearDivs(0);
-    var objs = setupObjects(NUM_GLYPHS);
-    glyph = GLYPH_TYPES[Math.floor(Math.random()*GLYPH_TYPES.length)];
-    generateGlyphs("glyphs", objs, glyph);
-    generateGlyph("explanation", glyph, getObject(9, {min:10, max:20}, 3));
-    generateGlyph("explanation", glyph, getObject(9, {min:80, max:100}, 3));
+    objs = setupObjects(NUM_GLYPHS);
+    glyph = getGylphType(runGlyphs);
 }
 
 function orderVersion(){
