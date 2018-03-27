@@ -1,18 +1,25 @@
 const NUM_GLYPHS = 21;
 const NUM_ORDERED_GLYPHS = 5;
-const GLYPH_TYPES = [3,5,6,7,8,9,10,11,12,13,14,15,17,18,19,20,21,22,23,24,28,30,31,32,33,34,35,36,37,38,39,40,41];
-selectCount = 0;
-responses = {type1: [], type2: []};
-selections = [];
-glyph = "";
-currentType2 = [];
+const GLYPH_TYPES = [5,6,7,8,9,10,11,12,13,14,17,18,19,20,21,22,23,24,30,31,32,33,34,35,36,37,38,39,40];
+var selectCount = 0;
+var responses = {type1: [], type2: []};
+var selections = [];
+var glyph = "";
+var currentType2 = [];
+var timer = null;
+var timerCount = 0;
+var part = 0;
+var oldDate = Date.now();
+
 
 window.onload = function() {
     gridVersion();
     setupContinueClick();
+    startTimer();
 };
 
 function clearDivs(part){
+    resetTimer();
     document.getElementById("glyphs").innerHTML = "";
     document.getElementById("explanation").innerHTML = "";
     document.getElementById("continue1").classList.remove('show');
@@ -25,6 +32,7 @@ function clearDivs(part){
 }
 
 function gridVersion(){
+    part = 0;
     clearDivs(0);
     var objs = setupObjects(NUM_GLYPHS);
     glyph = GLYPH_TYPES[Math.floor(Math.random()*GLYPH_TYPES.length)];
@@ -34,6 +42,7 @@ function gridVersion(){
 }
 
 function orderVersion(){
+    part = 1;
     clearDivs(1);
     var objs = setupOrderedObjects(NUM_ORDERED_GLYPHS);
     generateGlyphs('glyphs', objs, glyph, 1);
@@ -66,18 +75,18 @@ function generateGlyph(id, glyph, obj, i, presType) {
 
 function setupCanvasClick(canvas, presType){
     if(presType === 1){
-        canvas.addEventListener('click', function(e){
+        canvas.addEventListener('click', function () {
             this.classList.add('selected');
             this.setAttribute('data-selorder', "" + selectCount);
             this.parentElement.classList.add('done');
             this.parentElement.setAttribute('data-selorder', "" + (selectCount++ + 1));
-            currentType2.push(this.dataset.order == this.dataset.selorder);
+            currentType2.push(this.dataset.selorder === this.dataset.order);
             if(selectCount === 5){
                 document.getElementById("continue2").classList.add('show');
             }
         });
     } else {
-        canvas.addEventListener('click', function(e){
+        canvas.addEventListener('click', function(){
             if(this.classList.contains('selected')){
                 selectCount--;
                 this.classList.remove('selected');
@@ -88,7 +97,7 @@ function setupCanvasClick(canvas, presType){
                 }
                 selections.splice(index, 1);
             } else if(selectCount < 5){
-                selectCount++
+                selectCount++;
                 this.classList.add('selected');
                 selections.push({id: this.id, correct: this.getAttribute('data-correct')});
             }
@@ -102,13 +111,41 @@ function setupCanvasClick(canvas, presType){
     }
 }
 
+function startTimer(){
+    var progress = document.getElementById('progressbar');
+    progress.classList.add('full');
+    timer = setInterval(function(){
+        if(timerCount > 149){
+            resetTimer();
+            if(part === 0){
+                orderVersion();
+            } else if (part === 1){
+                gridVersion();
+            }
+        }
+        timerCount++;
+    }, 100);
+}
+
+function resetTimer(){
+    var progress = document.getElementById('progressbar');
+    progress.classList.remove('full');
+    setTimeout(function(){
+        progress.classList.add('full');
+        timerCount = 0;
+        oldDate = Date.now();
+    }, 1);
+
+}
+
 function setupContinueClick(){
     document.getElementById('continue1').addEventListener('click', function(e){
        e.preventDefault();
        if(selections.length > 0){
            responses.type1.push({
                glyphType: glyph,
-               selections: selections
+               selections: selections,
+               decisionTime: Date.now() - oldDate
            });
            selections = [];
            selectCount = 0;
@@ -120,7 +157,8 @@ function setupContinueClick(){
         if(selectCount === 5){
             responses.type2.push({
                 glyphType: glyph,
-                answers: currentType2
+                answers: currentType2,
+                decisionTime: Date.now() - oldDate
             });
             currentType2 = [];
             selectCount = 0;

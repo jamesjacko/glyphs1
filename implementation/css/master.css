@@ -1,5 +1,7 @@
 body{
   font-family: 'Lucida Grande', 'Lucida Sans Unicode', arial, sans-serif;
+  margin:0;
+  padding:20px 0 0;
 }
 #glyphs{
   width:770px;
@@ -62,4 +64,17 @@ canvas.selected{
   content: "";
   display: table;
   clear: both;
+}
+#progressbar{
+  width:0;
+  height:10px;
+  top:0;
+  left:0;
+  position: absolute;
+  background: darkolivegreen;
+}
+#progressbar.full{
+  transition: width 15s linear;
+  transition-timing-function: linear;
+  width:100vw;
 }
