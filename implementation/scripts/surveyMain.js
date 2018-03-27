@@ -2,9 +2,10 @@ const NUM_GLYPHS = 21;
 const NUM_ORDERED_GLYPHS = 5;
 const GLYPH_TYPES = [3,5,6,7,8,9,10,11,12,13,14,15,17,18,19,20,21,22,23,24,28,30,31,32,33,34,35,36,37,38,39,40,41];
 selectCount = 0;
-responses = [];
+responses = {type1: [], type2: []};
 selections = [];
 glyph = "";
+currentType2 = [];
 
 window.onload = function() {
     gridVersion();
@@ -14,6 +15,8 @@ window.onload = function() {
 function clearDivs(part){
     document.getElementById("glyphs").innerHTML = "";
     document.getElementById("explanation").innerHTML = "";
+    document.getElementById("continue1").classList.remove('show');
+    document.getElementById("continue2").classList.remove('show');
     if(part === 0){
         document.getElementById("glyphs").classList.remove("part2");
     } else if (part === 1){
@@ -68,6 +71,10 @@ function setupCanvasClick(canvas, presType){
             this.setAttribute('data-selorder', "" + selectCount);
             this.parentElement.classList.add('done');
             this.parentElement.setAttribute('data-selorder', "" + (selectCount++ + 1));
+            currentType2.push(this.dataset.order == this.dataset.selorder);
+            if(selectCount === 5){
+                document.getElementById("continue2").classList.add('show');
+            }
         });
     } else {
         canvas.addEventListener('click', function(e){
@@ -99,7 +106,7 @@ function setupContinueClick(){
     document.getElementById('continue1').addEventListener('click', function(e){
        e.preventDefault();
        if(selections.length > 0){
-           responses.push({
+           responses.type1.push({
                glyphType: glyph,
                selections: selections
            });
@@ -108,4 +115,16 @@ function setupContinueClick(){
            orderVersion();
        }
     });
+    document.getElementById('continue2').addEventListener('click', function(e){
+        e.preventDefault();
+        if(selectCount === 5){
+            responses.type2.push({
+                glyphType: glyph,
+                answers: currentType2
+            });
+            currentType2 = [];
+            selectCount = 0;
+            gridVersion();
+        }
+    })
 }

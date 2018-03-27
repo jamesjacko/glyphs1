@@ -50,7 +50,12 @@ canvas.selected{
   clear:both;
   margin:0 auto;
 }
-#continue1.show{
+#continue2{
+  display: none;
+  clear:both;
+  margin:0 auto;
+}
+#continue1.show, #continue2.show{
   display: block!important;
 }
 .clear:after {
