@@ -1,11 +1,12 @@
-function getObject(itemLength, range, groups){
+function getObject(itemLength, range, groups, order){
     var obj = {
         name: "student",
         groups: [
             0, 1, 2
         ],
         values: [],
-        correct: range.max === 40
+        correct: range.max === 40,
+        order: order
     };
     for(var i = 0; i < itemLength; i++){
         var value = {
@@ -32,6 +33,18 @@ function getRanges(numObjects, targetNumber){
     return shuffleArray(ranges);
 }
 
+function getOrderedRanges(numObjects){
+    var diff = Math.floor(100 / numObjects);
+    var ranges = [];
+    for(var i = 0; i < numObjects; i++){
+        ranges.push({
+            min: i * diff,
+            max: (i+1) * diff
+        });
+    }
+    return ranges;
+}
+
 function shuffleArray(array) {
     for (var i = array.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
@@ -49,7 +62,20 @@ function getObjects(num, corrNum){
     return objs;
 }
 
+function getOrderedObjects(num){
+    var objs = [];
+    var ranges = getOrderedRanges(num);
+    for(var i = 0; i < num; i++){
+        objs.push(getObject(9, ranges[i], 3, i));
+    }
+    return shuffleArray(objs);
+}
+
 function setupObjects(objectCount){
     var correctObjectCount = 5;
-    return getObjects(objectCount, correctObjectCount);;
+    return getObjects(objectCount, correctObjectCount);
+}
+
+function setupOrderedObjects(objectCount){
+    return getOrderedObjects(objectCount);
 }
