@@ -37,12 +37,12 @@ function clearDivs(part){
 }
 
 function runGlyphs(glyphType){
-    console.log(glyphType);
+
     glyph = parseInt(glyphType);
-    console.log(typeof glyph);
     generateGlyphs("glyphs", objs, glyph);
     generateGlyph("explanation", glyph, getObject(9, {min:10, max:20}, 3));
     generateGlyph("explanation", glyph, getObject(9, {min:80, max:100}, 3));
+    resetTimer();
     startTimer();
 }
 
@@ -126,9 +126,9 @@ function setupCanvasClick(canvas, presType){
 function startTimer(){
     var progress = document.getElementById('progressbar');
     progress.classList.add('full');
+    clearInterval(timer);
     timer = setInterval(function(){
         if(timerCount > 149){
-            resetTimer();
             if(part === 0){
                 orderVersion();
             } else if (part === 1){
