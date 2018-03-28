@@ -2,6 +2,7 @@ body{
   font-family: 'Lucida Grande', 'Lucida Sans Unicode', arial, sans-serif;
   margin:0;
   padding:20px 0 0;
+  background: url("../images/footer_lodyas.png") repeat;
 }
 #wrapper{
   width:770px;
@@ -9,6 +10,7 @@ body{
   clear: both;
   position: relative;
   padding: 25px 15px 15px;
+  background: white;
   box-shadow: 1px 1px 3px #000;
   border: 1px solid #FFF;
 }
