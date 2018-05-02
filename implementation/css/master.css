@@ -1,8 +1,10 @@
 body{
-  font-family: 'Lucida Grande', 'Lucida Sans Unicode', arial, sans-serif;
+  font-family: Georgia, "Times New Roman", Serif;
   margin:0;
-  padding:20px 0 0;
+  padding:0;
   background: url("../images/footer_lodyas.png") repeat;
+  font-size:14px;
+  color: #273719;
 }
 #wrapper{
   width:770px;
@@ -10,7 +12,7 @@ body{
   clear: both;
   position: relative;
   padding: 25px 15px 15px;
-  background: white;
+  background: #FFFFFF;
   box-shadow: 1px 1px 3px #000;
   border: 1px solid #FFF;
 }
@@ -19,6 +21,14 @@ body{
 }
 #description{
   text-align: center;
+  width:770px;
+  background: #FFFFFF;
+  margin:0 auto 20px;
+  padding:20px 10px 10px;
+  border-radius: 5px;
+  margin-top:-10px;
+  box-shadow: 1px 1px 3px #000;
+  line-height: 2;
 }
 #explanation{
   width:220px;
