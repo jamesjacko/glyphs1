@@ -19,19 +19,6 @@ window.onload = function() {
       document.getElementById("checks").appendChild(div);
     }
     var obj = JSON.parse(document.getElementById("JSON").value);
-		// for (var i = 0; i < obj.object.values.length; i++) {
-		// 	obj.object.values[i].value = Math.round(Math.random() * 100);
-		// }
-		// for (var i = 0; i < 10; i++) {
-		// 	var newObj = {
-		// 		name: "blah",
-		// 		min: 0,
-		// 		max: 100,
-		// 		value: Math.round(Math.random() * 50) + 50
-		// 	}
-		// 	obj.object.values.push(newObj);
-		// }
-		document.getElementById("JSON").value = JSON.stringify(obj, null, 2);
     depictChecked(obj.views);
     generateGlyphs("glyphs", numGlyphTypes);
     document.getElementById("JSON").addEventListener("keydown", function(e) {
