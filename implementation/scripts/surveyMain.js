@@ -23,13 +23,13 @@ window.onload = function() {
 };
 
 function clearDivs(part){
-    resetTimer();
     document.getElementById("glyphs").innerHTML = "";
     document.getElementById("explanation").innerHTML = "";
     document.getElementById("continue1").classList.remove('show');
     document.getElementById("continue2").classList.remove('show');
     if(part === 0){
         document.getElementById("wrapper").classList.remove("part2");
+        document.getElementById("continue1").classList.add('show');
     } else if (part === 1){
         document.getElementById("wrapper").classList.add("part2");
     }
@@ -42,8 +42,6 @@ function runGlyphs(glyphType){
     generateGlyphs("glyphs", objs, glyph);
     generateGlyph("explanation", glyph, getObject(9, {min:10, max:20}, 3));
     generateGlyph("explanation", glyph, getObject(9, {min:80, max:100}, 3));
-    resetTimer();
-    startTimer();
 }
 
 function gridVersion(){
