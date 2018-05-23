@@ -71,8 +71,9 @@ function generateGlyph(id, glyph, obj, i, presType) {
     div = document.createElement('div');
     div.classList.add('glyph');
     canvas = document.createElement('canvas');
-    canvas.width = 80;
-    canvas.height = 80;
+    var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0) > 600 ? 80 : 50;
+    canvas.width = w;
+    canvas.height = w;
     canvas.style.background = "#FFF";
     canvas.setAttribute("id", "glyph" + i);
     canvas.setAttribute('data-correct', obj.correct);
