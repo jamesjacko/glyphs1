@@ -1,6 +1,6 @@
 var seed, colorSeed, settings;
 
-var GLYPH_COUNT = 41;
+var GLYPH_COUNT = 42;
 /**
  * As there is no way to seed a random within the JS Math clas it is
  * necessary to provide a seedable random function.
@@ -88,7 +88,7 @@ function draw(ctx, glyph) {
 
 	for (var i = 0; i < midPoints.length; i++) {
 		var norm = (settings.values[i].value - settings.values[i].min) / (settings.values[i].max - settings.values[i].min);
-		var featureHeight = 20;
+		var featureHeight = 10;
 		var normValue = featureHeight * norm;
 		var point = {
 			x: Math.sin(midPoints[i].angle) * normValue + midPoints[i].x,
@@ -434,6 +434,26 @@ function draw(ctx, glyph) {
 					colors: groupedColors[i]
 				});
 			}
+			break
+		case 41:
+		for (var i = 0; i < midPoints.length; i++) {
+			var width = Math.sqrt(
+				Math.pow(coords[i+1].x - coords[i].x, 2) +
+				Math.pow(coords[i+1].y - coords[i].y, 2)
+			) / 2;
+			console.log(midPoints[i]);
+			var norm = (settings.values[i].value - settings.values[i].min) / (settings.values[i].max - settings.values[i].min);
+			var height = Math.sqrt(
+				Math.pow(coords[i].x - coords[i+1].x, 2) +
+				Math.pow(coords[i+1].y - coords[i].y, 2)
+			) / 2;
+			var angle = Math.atan2(coords[i+1].x - coords[i].x, coords[i+1].y - coords[i].y);
+			drawEllipseByCenter(ctx, midPoints[i].x, midPoints[i].y, height * norm, width * norm, -angle, {
+				x: offsetx,
+				y: offsety
+			});
+		}
+
 	}
 }
 
@@ -637,6 +657,33 @@ function drawCircle(ctx, centre, offset, size, color, options) {
 		size: sizeNorm
 	};
 }
+
+function drawEllipseByCenter(ctx, cx, cy, w, h, angle, offset) {
+	ctx.beginPath();
+  ctx.ellipse(cx - w/2.0 + offset.x, cy - h/2.0 + offset.y, w, h, angle, 0, 2 * Math.PI);
+	ctx.stroke();
+}
+
+function drawEllipse(ctx, x, y, w, h) {
+  var kappa = .5522848,
+      ox = (w / 2) * kappa, // control point offset horizontal
+      oy = (h / 2) * kappa, // control point offset vertical
+      xe = x + w,           // x-end
+      ye = y + h,           // y-end
+      xm = x + w / 2,       // x-middle
+      ym = y + h / 2;       // y-middle
+
+  ctx.beginPath();
+  ctx.moveTo(x, ym);
+  ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+  ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+  ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+  ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+  //ctx.closePath(); // not used correctly, see comments (use to close off open path)
+  ctx.stroke();
+}
+
+
 
 function drawRectangles(ctx, offsetx, offsety, coords, size, colors, options) {
 	var count = 0;
