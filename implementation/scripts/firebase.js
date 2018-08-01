@@ -12,7 +12,18 @@ firebase.initializeApp(config);
 function saveEmail(email, callback){
   console.log(email);
   var ref = firebase.database().ref("/emails");
-  ref.push(email,function(error){
+  ref.push(email, function(error){
+    if(error){
+
+    }else{
+      callback();
+    }
+  });
+}
+
+function sendResponse(response, type, callback){
+  var ref = firebase.database().ref("/resp" + type);
+  ref.push(response, function(error){
     if(error){
 
     }else{

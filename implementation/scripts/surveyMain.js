@@ -45,6 +45,8 @@ function runGlyphs(glyphType){
 }
 
 function gridVersion(){
+  selections = [];
+  selectCount = 0;
     part = 0;
     clearDivs(0);
     objs = setupObjects(NUM_GLYPHS);
@@ -52,6 +54,8 @@ function gridVersion(){
 }
 
 function orderVersion(){
+    selections = [];
+    selectCount = 0;
     part = 1;
     clearDivs(1);
     var objs = setupOrderedObjects(NUM_ORDERED_GLYPHS);
@@ -153,27 +157,22 @@ function setupContinueClick(){
     document.getElementById('continue1').addEventListener('click', function(e){
        e.preventDefault();
        if(selections.length > 0){
-           responses.type1.push({
+           sendResponse({
                glyphType: glyph,
                selections: selections,
                decisionTime: Date.now() - oldDate
-           });
-           selections = [];
-           selectCount = 0;
-           orderVersion();
+           }, 1, orderVersion);
+
        }
     });
     document.getElementById('continue2').addEventListener('click', function(e){
         e.preventDefault();
         if(selectCount === 5){
-            responses.type2.push({
-                glyphType: glyph,
-                answers: currentType2,
-                decisionTime: Date.now() - oldDate
-            });
-            currentType2 = [];
-            selectCount = 0;
-            gridVersion();
+          sendResponse({
+            glyphType: glyph,
+            answers: currentType2,
+            decisionTime: Date.now() - oldDate
+          }, 2, gridVersion);
         }
     })
 }
