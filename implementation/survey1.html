@@ -5,6 +5,8 @@
 		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
 		<link rel="stylesheet" href="css/master.css">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+		<script src="scripts/firebase.js" charset="utf-8"></script>
 		<script src="scripts/opening.js" charset="utf-8"></script>
 		<title></title>
 	</head>
@@ -20,7 +22,7 @@
 				<li>Evalute your feelings towards each glyph type. You will be asked to rate a particular glypoh based on its appeal and ability to portray the information.</li>
 			</ol>
 			<p>If you would like to be updated with the results of the survey please supply your email:</p>
-			<input type="email" name="email" />
+			<input type="email" name="email" id="email" placeholder="me@example.com" />
 			<button type="button" name="button" class="float-right" id="next">Continue ></button>
 		</div>
 	</body>

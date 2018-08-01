@@ -9,6 +9,17 @@ var config = {
 };
 firebase.initializeApp(config);
 
+function saveEmail(email, callback){
+  console.log(email);
+  var ref = firebase.database().ref("/emails");
+  ref.push(email,function(error){
+    if(error){
+
+    }else{
+      callback();
+    }
+  });
+}
 
 function getGylphType(callback){
     var ref = firebase.database().ref("/types");
