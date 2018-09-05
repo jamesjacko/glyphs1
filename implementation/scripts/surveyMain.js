@@ -16,7 +16,7 @@ var oldDate = Date.now();
 var objs = null;
 var explanations = [
     'The two images below depict a low graded (left) and high graded (right) student respectively.<br>Please select the low graded students from the grid below and continue when done.',
-    'Please rank the following students in order, from lowest to highest.'
+    'Please rank the following students in order, from lowest to highest. We are after your first impression so you will not be able to deselct your answers.'
 ]
 
 
