@@ -1,6 +1,7 @@
 const NUM_GLYPHS = 21;
 const NUM_ORDERED_GLYPHS = 5;
 const GLYPH_TYPES = [5,6,7,8,9,10,11,12,13,14,17,18,19,20,21,22,23,24,30,31,32,33,34,35,36,37,38,39,40];
+var num_correct;
 var selectCount = 0;
 var responses = {type1: [], type2: []};
 var selections = [];
@@ -12,7 +13,7 @@ var part = 0;
 var oldDate = Date.now();
 var objs = null;
 var explanations = [
-    'The two images below depict a low graded and high graded student respectively.<br>Please select the 5 low graded students from the grid below and continue when done.',
+    'The two images below depict a low graded (left) and high graded (right) student respectively.<br>Please select the low graded students from the grid below and continue when done.',
     'Please rank the following students in order, from lowest to highest.'
 ]
 
@@ -37,19 +38,19 @@ function clearDivs(part){
 }
 
 function runGlyphs(glyphType){
-
     glyph = parseInt(glyphType);
     generateGlyphs("glyphs", objs, glyph);
-    generateGlyph("explanation", glyph, getObject(9, {min:10, max:20}, 3));
-    generateGlyph("explanation", glyph, getObject(9, {min:80, max:100}, 3));
+    generateGlyph("explanation", glyph, getObject(9, {min:10, max:20}, 3), null, null, true);
+    generateGlyph("explanation", glyph, getObject(9, {min:80, max:100}, 3), null, null, true);
 }
 
 function gridVersion(){
   selections = [];
   selectCount = 0;
     part = 0;
+    num_correct = Math.floor(Math.random() * 5) + 2;
     clearDivs(0);
-    objs = setupObjects(NUM_GLYPHS);
+    objs = setupObjects(NUM_GLYPHS, num_correct);
     glyph = getGylphType(runGlyphs);
 }
 
@@ -58,6 +59,7 @@ function orderVersion(){
     selectCount = 0;
     part = 1;
     clearDivs(1);
+    num_correct = NUM_ORDERED_GLYPHS;
     var objs = setupOrderedObjects(NUM_ORDERED_GLYPHS);
     generateGlyphs('glyphs', objs, glyph, 1);
 }
@@ -70,7 +72,7 @@ function generateGlyphs(id, objs, glyph, presType){
   }
 }
 
-function generateGlyph(id, glyph, obj, i, presType) {
+function generateGlyph(id, glyph, obj, i, presType, noClick) {
     var div, canvas;
     div = document.createElement('div');
     div.classList.add('glyph');
@@ -82,9 +84,12 @@ function generateGlyph(id, glyph, obj, i, presType) {
     canvas.setAttribute("id", "glyph" + i);
     canvas.setAttribute('data-correct', obj.correct);
     canvas.setAttribute('data-order', obj.order);
+    canvas.setAttribute('data-click', noClick);
     div.appendChild(canvas);
     getGlyph(canvas, glyph, obj);
-    setupCanvasClick(canvas, presType);
+    if(typeof noClick === "undefined"){
+      setupCanvasClick(canvas, presType);
+    }
     document.getElementById(id).appendChild(div);
 }
 
@@ -96,7 +101,7 @@ function setupCanvasClick(canvas, presType){
             this.parentElement.classList.add('done');
             this.parentElement.setAttribute('data-selorder', "" + (selectCount++ + 1));
             currentType2.push(this.dataset.selorder === this.dataset.order);
-            if(selectCount === 5){
+            if(selectCount === num_correct){
                 document.getElementById("continue2").classList.add('show');
             }
         });
@@ -111,13 +116,13 @@ function setupCanvasClick(canvas, presType){
                         index = i;
                 }
                 selections.splice(index, 1);
-            } else if(selectCount < 5){
+            } else if(selectCount < num_correct){
                 selectCount++;
                 this.classList.add('selected');
                 selections.push({id: this.id, correct: this.getAttribute('data-correct')});
             }
             var elem = document.getElementById("continue1");
-            if(selectCount === 5){
+            if(selectCount === num_correct){
                 elem.classList.add('show');
             }else {
                 elem.classList.remove('show');

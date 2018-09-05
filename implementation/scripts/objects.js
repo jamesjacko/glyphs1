@@ -71,8 +71,7 @@ function getOrderedObjects(num){
     return shuffleArray(objs);
 }
 
-function setupObjects(objectCount){
-    var correctObjectCount = 5;
+function setupObjects(objectCount, correctObjectCount){
     return getObjects(objectCount, correctObjectCount);
 }
 
