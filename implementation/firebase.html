@@ -15,10 +15,26 @@
             messagingSenderId: "658454614320"
         };
         firebase.initializeApp(config);
-        const GLYPH_TYPES = [5,6,7,8,9,10,11,12,13,14,17,18,19,20,21,22,23,24,30,31,32,33,34,35,36,37,38,39,40];
-        var elems = [];
-        for(var i = 0; i < GLYPH_TYPES.length; i++){
-            firebase.database().ref('types/' + GLYPH_TYPES[i]).set(0);
+
+
+        function setupTypes(){
+          const GLYPH_TYPES = [5,6,7,8,9,10,11,12,13,14,17,18,19,20,21,22,23,24,30,31,32,33,34,35,36,37,38,39,40,42];
+          var elems = [];
+          for(var i = 0; i < GLYPH_TYPES.length; i++){
+              firebase.database().ref('types/' + GLYPH_TYPES[i]).set(0);
+          }
+        }
+
+        window.onload = function(e){
+          e.preventDefault();
+          document.getElementById('go').addEventListener('click', function(e){
+            if(confirm("Are you sure?")){
+              if (confirm("100%?")) {
+                if(confirm("You could lose your valuable research data!!"))
+                  setupTypes();
+              }
+            }
+          });
         }
 
 
@@ -27,7 +43,8 @@
 </head>
 
 <body>
-
+  Tread very, very, VERY carefully<br>
+  <input type="button" id="go" value="Format DB">
 </body>
 
 </html>

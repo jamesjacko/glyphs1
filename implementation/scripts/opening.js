@@ -12,6 +12,8 @@ window.onload = function(){
         alert("Your email: " + email + ", doesn't seem valid");
         document.getElementById('email').focus();
       }
+    } else {
+      nextPage();
     }
   })
 }

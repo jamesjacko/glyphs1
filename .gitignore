@@ -4,3 +4,7 @@ implementation/node_modules/
 implementation/semantic.json
 
 implementation/\.idea/
+
+implementation/\.DS_Store
+
+\.DS_Store
