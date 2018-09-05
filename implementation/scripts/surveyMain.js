@@ -1,6 +1,8 @@
 const NUM_GLYPHS = 21;
 const NUM_ORDERED_GLYPHS = 5;
 const GLYPH_TYPES = [5,6,7,8,9,10,11,12,13,14,17,18,19,20,21,22,23,24,30,31,32,33,34,35,36,37,38,39,40];
+const TOTAL_QUESTIONS = 30;
+var question_count = 0;
 var num_correct;
 var selectCount = 0;
 var responses = {type1: [], type2: []};
@@ -24,10 +26,15 @@ window.onload = function() {
 };
 
 function clearDivs(part){
+    if(part === 0){
+      ++question_count;
+    }
     document.getElementById("glyphs").innerHTML = "";
     document.getElementById("explanation").innerHTML = "";
     document.getElementById("continue1").classList.remove('show');
     document.getElementById("continue2").classList.remove('show');
+    document.getElementById('current_number').innerHTML = question_count;
+    document.getElementById('total_number').innerHTML = TOTAL_QUESTIONS;
     if(part === 0){
         document.getElementById("wrapper").classList.remove("part2");
         document.getElementById("continue1").classList.add('show');
@@ -122,11 +129,11 @@ function setupCanvasClick(canvas, presType){
                 selections.push({id: this.id, correct: this.getAttribute('data-correct')});
             }
             var elem = document.getElementById("continue1");
-            if(selectCount === num_correct){
-                elem.classList.add('show');
-            }else {
-                elem.classList.remove('show');
-            }
+            // if(selectCount === num_correct){
+            //     elem.classList.add('show');
+            // }else {
+            //     elem.classList.remove('show');
+            // }
         });
     }
 }
