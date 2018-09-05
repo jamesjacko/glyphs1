@@ -1,7 +1,7 @@
 const NUM_GLYPHS = 21;
 const NUM_ORDERED_GLYPHS = 5;
 const GLYPH_TYPES = [5,6,7,8,9,10,11,12,13,14,17,18,19,20,21,22,23,24,30,31,32,33,34,35,36,37,38,39,40];
-const TOTAL_QUESTIONS = 30;
+const TOTAL_QUESTIONS = 3;
 var question_count = 0;
 var num_correct;
 var selectCount = 0;
@@ -28,6 +28,7 @@ window.onload = function() {
 function clearDivs(part){
     if(part === 0){
       ++question_count;
+      if(question_count > TOTAL_QUESTIONS) window.location.href = "surveyThanks.html";
     }
     document.getElementById("glyphs").innerHTML = "";
     document.getElementById("explanation").innerHTML = "";
