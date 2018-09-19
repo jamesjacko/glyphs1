@@ -1,7 +1,7 @@
 const NUM_GLYPHS = 21;
 const NUM_ORDERED_GLYPHS = 5;
 const GLYPH_TYPES = [5,6,7,8,9,10,11,12,13,14,17,18,19,20,21,22,23,24,30,31,32,33,34,35,36,37,38,39,40];
-const TOTAL_QUESTIONS = 3;
+const TOTAL_QUESTIONS = 30;
 var question_count = 0;
 var num_correct;
 var selectCount = 0;
@@ -43,6 +43,7 @@ function clearDivs(part){
         document.getElementById("wrapper").classList.add("part2");
     }
     document.getElementById('description').innerHTML = explanations[part];
+		oldDate = Date.now();
 }
 
 function runGlyphs(glyphType){
@@ -54,6 +55,7 @@ function runGlyphs(glyphType){
 
 function gridVersion(){
   selections = [];
+	currentType2 = [];
   selectCount = 0;
     part = 0;
     num_correct = Math.floor(Math.random() * 5) + 2;
@@ -187,5 +189,6 @@ function setupContinueClick(){
             decisionTime: Date.now() - oldDate
           }, 2, gridVersion);
         }
+
     })
 }
