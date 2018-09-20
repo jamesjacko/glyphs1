@@ -1,19 +1,13 @@
-function nextPage(){
-  window.location.href = 'survey.html';
+function nextPage(src){
+  window.location.href = 'survey.html?ref='+src;
 }
 window.onload = function(){
-  document.getElementById('next').addEventListener('click', function(e){
-    e.preventDefault();
-    var email = document.getElementById('email').value
-    if(email !== ""){
-      if(/(.+)@(.+){2,}\.(.+){2,}/.test(email)){
-        saveEmail(email,nextPage);
-      } else {
-        alert("Your email: " + email + ", doesn't seem valid");
-        document.getElementById('email').focus();
-      }
-    } else {
-      nextPage();
-    }
-  })
+  var buttons = document.querySelectorAll('#next, #next1');
+  for(var i = 0; i < buttons.length; i++){
+    buttons[i].addEventListener('click', function(e){
+      e.preventDefault();
+      console.log(e);
+      nextPage(e.srcElement.id);
+    });
+  }
 }
