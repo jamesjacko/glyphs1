@@ -168,3 +168,12 @@ input[type="email"]{
       min-height: 0;
     }
 }
+#bangorLogo{
+  height:100px;
+  background: #FFF;
+  clear:both;
+  float:right;
+  margin-top:40px;
+  border:5px solid #FFF;
+  box-shadow: 2px 2px 2px #000;
+}
