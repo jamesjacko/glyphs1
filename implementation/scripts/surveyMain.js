@@ -52,6 +52,8 @@ function clearDivs(part){
 }
 
 function showFinalQuestions(){
+		document.getElementById("question_number").style.display = "none";
+		document.getElementById("description").style.display = "none";
 		document.getElementById("glyphs").innerHTML = "";
 		document.getElementById("explanation").innerHTML = "";
 		document.getElementById("continue1").classList.remove('show');
