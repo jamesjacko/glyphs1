@@ -98,17 +98,12 @@ body.survey canvas{
 .glyph.done:after{
   display: block;
 }
-#continue1{
+#continue1, #continue2, #continue3{
   display: none;
   clear:both;
   margin:0 auto;
 }
-#continue2{
-  display: none;
-  clear:both;
-  margin:0 auto;
-}
-#continue1.show, #continue2.show{
+#continue1.show, #continue2.show, #continue3.show{
   display: block!important;
 }
 .clear:after {
@@ -149,6 +144,9 @@ input[type="email"]{
   padding:0 6px;
   clear: both;
   display: block;
+}
+#closingQuestions{
+	display: none;
 }
 @media only screen and (max-width: 600px) {
     body{
