@@ -26,9 +26,9 @@ body.survey{
 	background: rgb(10%, 15%, 18%);
 	min-height:calc(100vh - 60px);
 }
-#wrapper.part2{
+/* #wrapper.part2{
   width:550px;
-}
+} */
 /* #description{
   text-align: center;
   width:770px;
@@ -181,6 +181,15 @@ textarea{
 	border:1px solid #2b4e63;
 	background:rgb(47, 70, 84);
 	color:rgba(255, 255, 255, 0.5);
+}
+.radioOptions{
+	list-style-type:none;
+	margin:0;
+	padding:0;
+}
+.radioOptions li{
+	display:inline;
+	padding-right:20px;
 }
 @media only screen and (max-width: 600px) {
     body{

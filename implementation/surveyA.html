@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<title>Micro Visualisation Survey</title>
+		<meta charset="utf-8">
+		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
+		<link rel="stylesheet" href="css/master.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+		<script src="scripts/firebase.js" charset="utf-8"></script>
+		<script src="scripts/opening.js" charset="utf-8"></script>
+		<title></title>
+	</head>
+	<body class="survey">
+		<div id="wrapper" class="page1">
+
+
+			<h1>Glyph Based Visualisation Study</h1>
+			<p><strong>Please read the following carefully.</strong></p>
+			<p>Please answer the following questions:</p>
+			<p>1: Please rate you competency with visualisations (Graphs, Plots and Charts), please rate yourself, 0 being little to no experience, 5 being expert knowledge</p>
+			<ul class="radioOptions">
+				<li><label>0<input type="radio" name="competency" value="0"></label></li>
+				<li><label>1<input type="radio" name="competency" value="1"></label></li>
+				<li><label>2<input type="radio" name="competency" value="2"></label></li>
+				<li><label>3<input type="radio" name="competency" value="3"></label></li>
+				<li><label>4<input type="radio" name="competency" value="4"></label></li>
+				<li><label>5<input type="radio" name="competency" value="5"></label></li>
+			</ul>
+
+			<p>2: Please rate your daily use of data visualisations (inluding smartphone and computer applications), 0 being never and 5 being multiple times per day</p>
+			<ul class="radioOptions">
+				<li><label>0<input type="radio" name="useage" value="0"></label></li>
+				<li><label>1<input type="radio" name="useage" value="1"></label></li>
+				<li><label>2<input type="radio" name="useage" value="2"></label></li>
+				<li><label>3<input type="radio" name="useage" value="3"></label></li>
+				<li><label>4<input type="radio" name="useage" value="4"></label></li>
+				<li><label>5<input type="radio" name="useage" value="5"></label></li>
+			</ul>
+			<button type="button" name="button" class="float-right" id="userRatingNext" disabled>Continue ></button>
+			<img src="images/Bangor_Logo_A1.png" alt="Bangor University Crest" id="bangorLogo" />
+		</div>
+	</body>
+</html>
