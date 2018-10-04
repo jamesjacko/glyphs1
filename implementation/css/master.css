@@ -5,7 +5,7 @@
 
 body{
   font-family:  'Lucida Grande', 'Lucida Sans Unicode', arial, sans-serif;
-	font-size: 12px;
+	font-size: 13px;
 	font-weight: 100;
   margin:0;
   padding:0;
@@ -26,9 +26,9 @@ body.survey{
 	background: rgb(10%, 15%, 18%);
 	min-height:calc(100vh - 60px);
 }
-#wrapper.part2{
+/* #wrapper.part2{
   width:550px;
-}
+} */
 /* #description{
   text-align: center;
   width:770px;
@@ -44,7 +44,7 @@ body.survey{
   width:220px;
   margin: 0 auto;
 }
-h1, a{
+h1, a, h2{
 	font-size: 1em;
 	font-weight: normal;
 	color: rgb(29%, 70%, 87%);
@@ -98,17 +98,12 @@ body.survey canvas{
 .glyph.done:after{
   display: block;
 }
-#continue1{
+#continue1, #continue2, #continue3{
   display: none;
   clear:both;
   margin:0 auto;
 }
-#continue2{
-  display: none;
-  clear:both;
-  margin:0 auto;
-}
-#continue1.show, #continue2.show{
+#continue1.show, #continue2.show, #continue3.show{
   display: block!important;
 }
 .clear:after {
@@ -138,6 +133,10 @@ button{
   border-left:3px solid rgb(29%, 70%, 87%);
   cursor:pointer;
 }
+button:disabled{
+	opacity:0.2;
+	cursor:default;
+}
 button#next1{
   margin-left:10px;
 }
@@ -153,6 +152,45 @@ input[type="email"]{
   clear: both;
   display: block;
 }
+input[type="checkbox"]{
+	font-size:20px;
+}
+label{
+	border-bottom:1px dotted  #477fa0;;
+}
+#closingQuestions{
+	display: none;
+}
+#bangorLogo{
+  height:70px;
+  background: #FFF;
+  clear:both;
+  border:20px solid #FFF;
+  border-right:600px solid #FFF;
+  opacity:0.8;
+	position:absolute;
+	bottom:20px;
+	right:-4px;
+	box-shadow: 1px 1px 1px #000;
+}
+textarea{
+	width:calc(100% - 10px);
+	height:90px;
+	line-height:30px;
+	padding:0 5px;
+	border:1px solid #2b4e63;
+	background:rgb(47, 70, 84);
+	color:rgba(255, 255, 255, 0.5);
+}
+.radioOptions{
+	list-style-type:none;
+	margin:0;
+	padding:0;
+}
+.radioOptions li{
+	display:inline;
+	padding-right:20px;
+}
 @media only screen and (max-width: 600px) {
     body{
       background: rgb(10%, 15%, 18%);
@@ -167,13 +205,19 @@ input[type="email"]{
       padding: 20px;
       min-height: 0;
     }
-}
-#bangorLogo{
-  height:100px;
-  background: #FFF;
-  clear:both;
-  float:right;
-  margin-top:40px;
-  border:5px solid #FFF;
-  box-shadow: 2px 2px 2px #000;
+		#bangorLogo{
+		  border-right:100px solid #FFF;
+		  opacity:1;
+			position:static;
+			float:right;
+		}
+		#bangorLogo:after,button:after {
+		  content: "";
+		  clear: both;
+		  display: table;
+		}
+		button{
+			float:none;
+			margin:10px 0;
+		}
 }
