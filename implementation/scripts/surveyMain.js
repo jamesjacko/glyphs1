@@ -2,6 +2,7 @@ const NUM_GLYPHS = 21;
 const NUM_ORDERED_GLYPHS = 5;
 const GLYPH_TYPES = [5,6,7,8,9,10,11,12,13,14,17,18,19,20,21,22,23,24,30,31,32,33,34,35,36,37,38,39,40];
 const TOTAL_QUESTIONS = 30;
+const REF = getRef();
 var question_count = 0;
 var num_correct;
 var selectCount = 0;
@@ -17,13 +18,19 @@ var objs = null;
 var explanations = [
     'The two images below depict a low graded (left) and high graded (right) student respectively.<br>Please select the low graded students from the grid below and continue when done.',
     'Please rank the following students in order, from lowest to highest. We are after your first impression so you will not be able to deselct your answers.'
-]
+];
 
 
 window.onload = function() {
     gridVersion();
     setupContinueClick();
 };
+
+function getRef(){
+  urlParams = new URLSearchParams(window.location.search);
+  ref = urlParams.get('ref');
+  return ref;
+}
 
 function clearDivs(part){
     if(part === 0){
@@ -173,17 +180,19 @@ function setupContinueClick(){
        e.preventDefault();
        if(selections.length > 0){
            sendResponse({
+               doneBefore: REF === 1 ? true : false,
                glyphType: glyph,
                selections: selections,
-               decisionTime: Date.now() - oldDate
+               decisionTime: Date.now() - oldDate,
+               missed: num_correct - selections.length
            }, 1, orderVersion);
-
        }
     });
     document.getElementById('continue2').addEventListener('click', function(e){
         e.preventDefault();
         if(selectCount === 5){
           sendResponse({
+            doneBefore: REF === 1 ? true : false,
             glyphType: glyph,
             answers: currentType2,
             decisionTime: Date.now() - oldDate

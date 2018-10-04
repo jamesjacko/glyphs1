@@ -1,5 +1,6 @@
 function nextPage(src){
-  window.location.href = 'survey.html?ref='+src;
+  var ref = (src === "next") ? "1" : "2"
+  window.location.href = 'survey.html?ref=' + ref;
 }
 window.onload = function(){
   var buttons = document.querySelectorAll('#next, #next1');
