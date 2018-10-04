@@ -1,13 +1,15 @@
 const NUM_GLYPHS = 21;
 const NUM_ORDERED_GLYPHS = 5;
 const GLYPH_TYPES = [5,6,7,8,9,10,11,12,13,14,17,18,19,20,21,22,23,24,30,31,32,33,34,35,36,37,38,39,40];
-const TOTAL_QUESTIONS = 30;
+console.log(getQ());
+const TOTAL_QUESTIONS = (getQ()!== null)? getQ() : 22;
 const REF = getRef();
 var question_count = 0;
 var num_correct;
 var selectCount = 0;
 var responses = {type1: [], type2: []};
 var selections = [];
+var glyphsShown = [];
 var glyph = "";
 var currentType2 = [];
 var timer = null;
@@ -26,12 +28,22 @@ window.onload = function() {
     setupContinueClick();
 };
 
+function getProps(){
+    urlParams = new URLSearchParams(window.location.search);
+    return {c: urlParams.get('c'), u: urlParams.get('u')};
+}
+
 function getRef(){
   urlParams = new URLSearchParams(window.location.search);
-  ref = urlParams.get('ref');
+  var ref = urlParams.get('ref');
   return ref;
 }
 
+function getQ(){
+  urlParams = new URLSearchParams(window.location.search);
+  var q = urlParams.get('q');
+  return q;
+}
 function clearDivs(part){
     if(part === 0){
       ++question_count;
@@ -59,6 +71,8 @@ function clearDivs(part){
 }
 
 function showFinalQuestions(){
+    selections = [];
+    selectCount = 0;
 		document.getElementById("question_number").style.display = "none";
 		document.getElementById("description").style.display = "none";
 		document.getElementById("glyphs").innerHTML = "";
@@ -67,6 +81,10 @@ function showFinalQuestions(){
 		document.getElementById("continue2").classList.remove('show');
 		document.getElementById("continue2").classList.add('show');
 		document.getElementById('closingQuestions').style.display = "block";
+    var obj = getObject(9, {min:40, max:60}, 3);
+    for (var i = 0; i < glyphsShown.length; i++) {
+      generateGlyph("glyphsFinal", glyphsShown[i], obj, glyphsShown[i], 1);
+    }
 }
 
 function runGlyphs(glyphType){
@@ -201,11 +219,13 @@ function setupContinueClick(){
        if(selections.length > 0){
            sendResponse({
                doneBefore: REF === 1 ? true : false,
+               props: getProps(),
                glyphType: glyph,
                selections: selections,
                decisionTime: Date.now() - oldDate,
                missed: num_correct - selections.length
            }, 1, orderVersion);
+           glyphsShown.push(glyph);
        }
     });
     document.getElementById('continue2').addEventListener('click', function(e){
@@ -213,6 +233,7 @@ function setupContinueClick(){
         if(selectCount === 5){
           sendResponse({
             doneBefore: REF === 1 ? true : false,
+            props: getProps(),
             glyphType: glyph,
             answers: currentType2,
             decisionTime: Date.now() - oldDate
