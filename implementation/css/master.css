@@ -44,7 +44,7 @@ body.survey{
   width:220px;
   margin: 0 auto;
 }
-h1, a{
+h1, a, h2{
 	font-size: 1em;
 	font-weight: normal;
 	color: rgb(29%, 70%, 87%);
@@ -133,6 +133,10 @@ button{
   border-left:3px solid rgb(29%, 70%, 87%);
   cursor:pointer;
 }
+button:disabled{
+	opacity:0.2;
+	cursor:default;
+}
 button#next1{
   margin-left:10px;
 }
@@ -151,6 +155,24 @@ input[type="email"]{
 #closingQuestions{
 	display: none;
 }
+#bangorLogo{
+  height:100px;
+  background: #FFF;
+  clear:both;
+  float:right;
+  margin-top:40px;
+  border:5px solid #FFF;
+  box-shadow: 2px 2px 2px #000;
+}
+textarea{
+	width:calc(100% - 10px);
+	height:90px;
+	line-height:30px;
+	padding:0 5px;
+	border:1px solid #2b4e63;
+	background:rgb(47, 70, 84);
+	color:rgba(255, 255, 255, 0.5);
+}
 @media only screen and (max-width: 600px) {
     body{
       background: rgb(10%, 15%, 18%);
@@ -165,13 +187,4 @@ input[type="email"]{
       padding: 20px;
       min-height: 0;
     }
-}
-#bangorLogo{
-  height:100px;
-  background: #FFF;
-  clear:both;
-  float:right;
-  margin-top:40px;
-  border:5px solid #FFF;
-  box-shadow: 2px 2px 2px #000;
 }

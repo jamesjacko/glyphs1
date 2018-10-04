@@ -58,6 +58,7 @@ function showFinalQuestions(){
 		document.getElementById("explanation").innerHTML = "";
 		document.getElementById("continue1").classList.remove('show');
 		document.getElementById("continue2").classList.remove('show');
+		document.getElementById("continue2").classList.add('show');
 		document.getElementById('closingQuestions').style.display = "block";
 }
 
