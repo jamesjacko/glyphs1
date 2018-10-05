@@ -11,7 +11,6 @@ function getRef(){
 
 
 function storeId(id){
-	console.log(id);
 	localStorage.setItem("id", id);
 }
 
@@ -23,7 +22,6 @@ window.onload = function(){
     for(var i = 0; i < buttons.length; i++){
       buttons[i].addEventListener('click', function(e){
         e.preventDefault();
-        console.log(e);
         nextPage(e.srcElement.id);
       });
     }

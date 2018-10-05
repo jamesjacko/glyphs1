@@ -38,11 +38,10 @@ function getId(callback){
 	ref.transaction(function(val) {
 	  return (val || 0) + 1;
 	});
-	ref.once('value', function(snapshot){
+	ref.on('value', function(snapshot){
 		id = snapshot.val();
-		//ref.update(snapshot.val() + 1);
-	}).then(function(){
 		callback(id);
+		//ref.update(snapshot.val() + 1);
 	})
 }
 

@@ -223,7 +223,8 @@ function setupContinueClick(){
                glyphType: glyph,
                selections: selections,
                decisionTime: Date.now() - oldDate,
-               missed: num_correct - selections.length
+               missed: num_correct - selections.length,
+							 respId: localStorage.getItem("id")
            }, 1, orderVersion);
            glyphsShown.push(glyph);
        }
@@ -236,7 +237,8 @@ function setupContinueClick(){
             props: getProps(),
             glyphType: glyph,
             answers: currentType2,
-            decisionTime: Date.now() - oldDate
+            decisionTime: Date.now() - oldDate,
+						respId: localStorage.getItem("id")
           }, 2, gridVersion);
         }
 
