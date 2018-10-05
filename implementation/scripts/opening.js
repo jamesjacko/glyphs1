@@ -10,9 +10,14 @@ function getRef(){
 }
 
 
+function storeId(id){
+	console.log(id);
+	localStorage.setItem("id", id);
+}
 
 
 window.onload = function(){
+	getId(storeId);
   if(window.location.href.includes("survey1.html")){
     var buttons = document.querySelectorAll('#next, #next1');
     for(var i = 0; i < buttons.length; i++){
