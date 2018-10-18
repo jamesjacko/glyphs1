@@ -71,8 +71,13 @@ function clearDivs(part){
 }
 
 function showFinalQuestions(){
+		if(getQ() === "1"){
+			glyphsShown = [5,6,7,8,9,10,11,12,13,14,17,18,19,20,21,22,23,24,30,31,32,33,34,35,36,37,38,39,40];
+		}
     selections = [];
+		currentType2 = [];
     selectCount = 0;
+		num_correct = 5;
 		document.getElementById("question_number").style.display = "none";
 		document.getElementById("description").style.display = "none";
 		document.getElementById("glyphs").innerHTML = "";
@@ -83,8 +88,25 @@ function showFinalQuestions(){
 		document.getElementById('closingQuestions').style.display = "block";
     var obj = getObject(9, {min:40, max:60}, 3);
     for (var i = 0; i < glyphsShown.length; i++) {
-      generateGlyph("glyphsFinal", glyphsShown[i], obj, glyphsShown[i], 1);
+      generateGlyph("glyphsFinal", glyphsShown[i], obj, glyphsShown[i], 3);
     }
+		var button = document.createElement('button');
+		var buttonText = document.createTextNode("Clear Selection");
+		button.appendChild(buttonText);
+		button.addEventListener('click', function(e){
+			e.preventDefault();
+			selections = [];
+			var canvases = document.getElementsByTagName('canvas');
+			for (var i = 0; i < canvases.length; i++) {
+				canvases[i].parentElement.removeAttribute('data-selorder');
+				canvases[i].removeAttribute('data-selorder');
+				canvases[i].parentElement.classList.remove('done');
+				canvases[i].classList.remove('selected');
+				currentType2 = [];
+				selectCount = 0;
+			}
+		});
+		document.getElementById('glyphsFinal').appendChild(button);
 }
 
 function runGlyphs(glyphType){
@@ -155,12 +177,25 @@ function setupCanvasClick(canvas, presType){
             this.setAttribute('data-selorder', "" + selectCount);
             this.parentElement.classList.add('done');
             this.parentElement.setAttribute('data-selorder', "" + (selectCount++ + 1));
-            currentType2.push(this.dataset.selorder === this.dataset.order);
+            currentType2.push({correct: this.dataset.selorder === this.dataset.order, type: glyph});
             if(selectCount === num_correct){
                 document.getElementById("continue2").classList.add('show');
             }
         });
-    } else {
+    } else if(presType === 3){
+			canvas.addEventListener('click', function () {
+				if(selectCount < num_correct){
+					this.classList.add('selected');
+					this.setAttribute('data-selorder', "" + selectCount);
+					this.parentElement.classList.add('done');
+					this.parentElement.setAttribute('data-selorder', "" + (selectCount++ + 1));
+					currentType2.push({correct: this.dataset.selorder === this.dataset.order, type: this.id});
+					if(selectCount === num_correct){
+							document.getElementById("continue2").classList.add('show');
+					}
+				}
+			});
+		} else {
         canvas.addEventListener('click', function(){
             if(this.classList.contains('selected')){
                 selectCount--;
