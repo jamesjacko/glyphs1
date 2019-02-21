@@ -248,6 +248,8 @@ function resetTimer(){
 
 }
 
+
+
 function setupContinueClick(){
     document.getElementById('continue1').addEventListener('click', function(e){
        e.preventDefault();
